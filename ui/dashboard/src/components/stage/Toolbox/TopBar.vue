@@ -89,7 +89,7 @@ export default {
   margin: auto;
   text-align: center;
   width: fit-content;
-  overflow-x: auto;
+  overflow: auto;
   z-index: 2;
 
   .card-content {
