@@ -11,7 +11,8 @@
     }"
   >
     <p ref="el" :style="options" contenteditable="true">
-      Write or paste<br />your text here
+      Write or paste
+      <br />your text here
     </p>
   </section>
   <template v-if="!isWriting">
@@ -51,31 +52,19 @@
       <span class="tag muted is-block">Color</span>
       <ColorPicker v-model="options.color" />
     </div>
-    <div
-      class="text-tool"
-      :class="{ active: options.fontWeight }"
-      @click="toggleBold"
-    >
+    <div class="text-tool" :class="{ active: options.fontWeight }" @click="toggleBold">
       <div class="icon is-large">
         <Icon size="36" src="bold.svg" />
       </div>
       <span class="tag is-block">Bold</span>
     </div>
-    <div
-      class="text-tool"
-      :class="{ active: options.fontStyle }"
-      @click="toggleItalic"
-    >
+    <div class="text-tool" :class="{ active: options.fontStyle }" @click="toggleItalic">
       <div class="icon is-large">
         <Icon size="36" src="italic.svg" />
       </div>
       <span class="tag is-block">Italic</span>
     </div>
-    <div
-      class="text-tool"
-      :class="{ active: options.textDecoration }"
-      @click="toggleUnderline"
-    >
+    <div class="text-tool" :class="{ active: options.textDecoration }" @click="toggleUnderline">
       <div class="icon is-large">
         <Icon size="36" src="underline.svg" />
       </div>
@@ -103,7 +92,7 @@ import ColorPicker from "@/components/form/ColorPicker";
 import Skeleton from "../Skeleton";
 import Icon from "@/components/Icon";
 import { useStore } from "vuex";
-import { computed, ref } from "vue";
+import { computed, onUnmounted, ref } from "vue";
 
 export default {
   components: { Dropdown, Field, ColorPicker, Skeleton, Icon },
@@ -224,10 +213,13 @@ export default {
 
     const savedTexts = computed(() => store.state.stage.board.texts);
     const fontDropdownOpen = (visible) => {
-      document.querySelector("#topbar").style.overflowY = visible
+      document.querySelector("#topbar").style.overflow = visible
         ? "visible"
-        : "hidden";
+        : "auto";
     };
+    onUnmounted(() => {
+      document.querySelector("#topbar").style.overflow = "auto";
+    })
 
     return {
       stageSize,
@@ -263,10 +255,5 @@ export default {
   z-index: 1001;
   position: relative;
   float: left;
-  .font-dropdown {
-    position: absolute !important;
-    transform: translateX(-50%);
-    z-index: 1000;
-  }
 }
 </style>

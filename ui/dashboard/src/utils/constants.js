@@ -78,3 +78,7 @@ export const MEDIA_COPYRIGHT_LEVELS = [
       "Nobody except the owner can user the media item; that is, only the owner can assign it to stages - if it is assigned to a stage then it would be available for players who have access to that stage",
   },
 ]
+
+export const imageExtensions = ".svg,.jpg,.png,.gif";
+export const audioExtensions = ".wav,.mpeg,.mp3,.aac,.aacp,.ogg,.webm,.flac,.m4a";
+export const videoExtensions = ".mp4,.webm,.opgg,.3gp,.flv";

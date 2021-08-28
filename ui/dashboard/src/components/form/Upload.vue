@@ -14,7 +14,7 @@
           <span class="file-icon">
             <i class="fas fa-file"></i>
           </span>
-          <span class="file-label"> Choose a file… </span>
+          <span class="file-label">Choose a file…</span>
         </slot>
       </span>
       <div v-if="!valid" class="mt-2 mx-2 has-text-danger">
@@ -39,6 +39,7 @@ import { ref } from "@vue/reactivity";
 import { computed, watch } from "@vue/runtime-core";
 import { humanFileSize } from "@/utils/common";
 import { useStore } from "vuex";
+import { imageExtensions, audioExtensions, videoExtensions } from "@/utils/constants";
 export default {
   props: {
     modelValue: String,
@@ -60,9 +61,6 @@ export default {
     });
     const file = ref(props.initialFile);
 
-    const imageExtensions = ".svg,.jpg,.png,.gif";
-    const audioExtensions = ".wav,.mpeg,.mp3,.aac,.aacp,.ogg,.webm,.flac,.m4a";
-    const videoExtensions = ".mp4,.webm,.opgg,.3gp,.flv";
     const accept = computed(() => {
       let extensions = [];
       if (props.type === "image" || !props.type) {
@@ -133,8 +131,7 @@ export default {
     const isImage = computed(() => file.value?.type?.startsWith("image"));
     const tooltip = computed(
       () =>
-        `Permitted file formats are ${
-          accept.value
+        `Permitted file formats are ${accept.value
         }. Maximum file size is ${humanFileSize(mediaLimit.value)}`
     );
 

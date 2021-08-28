@@ -42,7 +42,6 @@
           <div v-else class="columns is-multiline">
             <template v-for="item in modelValue" :key="item">
               <div
-                v-if="data.includes(item)"
                 class="column item is-3"
                 @click="remove(item)"
                 :class="columnClass(item)"
@@ -54,6 +53,7 @@
                 </Selectable>
               </div>
             </template>
+            <slot name="extras"></slot>
           </div>
         </div>
       </div>

@@ -30,8 +30,6 @@
 </template>
 
 <script>
-/* eslint-disable vue/no-mutating-props */
-
 import { ref } from "@vue/reactivity";
 import { computed, onMounted, onUnmounted, watch } from "@vue/runtime-core";
 import Moveable from "moveable";

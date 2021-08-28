@@ -221,9 +221,11 @@ class UpdateMedia(graphene.Mutation):
         copyright_level = graphene.Int(description="Copyright level")
         player_access = graphene.String(
             description="Users who can access and edit this media")
+        uploaded_frames = graphene.List(
+            graphene.String, description="Base64 encoded of new uploaded frames")
 
     @jwt_required()
-    def mutate(self, info, name, media_type, base64=None, file_location=None, description=None, id=None, copyright_level=None, player_access=None):
+    def mutate(self, info, name, media_type, base64=None, file_location=None, description=None, id=None, copyright_level=None, player_access=None, uploaded_frames=None):
         current_user_id = get_jwt_identity()
         with ScopedSession() as local_db_session:
             asset_type = local_db_session.query(AssetTypeModel).filter(
@@ -287,6 +289,29 @@ class UpdateMedia(graphene.Mutation):
                     local_db_session.add(asset_license)
                 local_db_session.flush()
 
+            if uploaded_frames:
+                filename, file_extension = os.path.splitext(
+                    asset.file_location)
+                attributes = json.loads(asset.description)
+                if not attributes['frames']:
+                    attributes['frames'] = []
+
+                for frame in uploaded_frames:
+                    unique_filename = uuid.uuid4().hex + file_extension
+                    mediaDirectory = os.path.join(
+                        absolutePath, storagePath, asset_type.file_location)
+                    if not os.path.exists(mediaDirectory):
+                        os.makedirs(mediaDirectory)
+                    with open(os.path.join(mediaDirectory, unique_filename), "wb") as fh:
+                        fh.write(b64decode(frame.split(',')[1]))
+
+                    frame_location = os.path.join(
+                        asset_type.file_location, unique_filename)
+                    attributes['frames'].append(frame_location)
+
+                asset.description = json.dumps(attributes)
+                local_db_session.flush()
+
             local_db_session.flush()
             local_db_session.commit()
             asset = local_db_session.query(AssetModel).filter(
@@ -314,6 +339,17 @@ class DeleteMedia(graphene.Mutation):
                 if not user.role in (ADMIN, SUPER_ADMIN):
                     if not user.id == asset.owner_id:
                         return DeleteMedia(success=False, message="Only media owner or admin can delete this media!")
+
+                attributes = json.loads(asset.description)
+                # Delete frames that was assigned only to this media
+                for frame in attributes['frames']:
+                    frame_asset = local_db_session.query(AssetModel).filter(
+                        AssetModel.file_location == frame).first()
+                    if not frame_asset:
+                        physical_path = os.path.join(
+                            absolutePath, storagePath, frame)
+                        if os.path.exists(physical_path):
+                            os.remove(physical_path)
 
                 physical_path = os.path.join(
                     absolutePath, storagePath, asset.file_location)
@@ -349,7 +385,7 @@ class AssignStagesInput(graphene.InputObjectType):
 
 
 class AssignStages(graphene.Mutation):
-    """Mutation to update a stage."""
+    """Mutation to assign stages to a media."""
     asset = graphene.Field(
         lambda: Asset, description="Asset with assigned stages")
 

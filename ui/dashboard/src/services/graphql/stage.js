@@ -343,13 +343,13 @@ export default {
     ${assetFragment}
   `),
   updateMedia: (variables) => client.request(gql`
-    mutation updateMedia($id: ID, $name: String!, $mediaType: String, $description: String, $fileLocation: String, $base64: String, $copyrightLevel: Int, $playerAccess: String) {
-      updateMedia(id: $id, name: $name, mediaType: $mediaType, description: $description, fileLocation: $fileLocation, base64: $base64, copyrightLevel: $copyrightLevel, playerAccess: $playerAccess) {
+    mutation updateMedia($id: ID, $name: String!, $mediaType: String, $description: String, $fileLocation: String, $base64: String, $copyrightLevel: Int, $playerAccess: String, $uploadedFrames: [String]) {
+      updateMedia(id: $id, name: $name, mediaType: $mediaType, description: $description, fileLocation: $fileLocation, base64: $base64, copyrightLevel: $copyrightLevel, playerAccess: $playerAccess, uploadedFrames: $uploadedFrames) {
         asset {
           id
         }
       }
-    }
+    }  
   `, variables),
   deleteMedia: (id) => client.request(gql`
     mutation deleteMedia($id: ID!) {
