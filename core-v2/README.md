@@ -39,6 +39,7 @@ This will start all the services defined in your `docker-compose.yml` file.
 
 
 ### 3. Application API endpoints
+- endpoint: domain.com/api/studio_graphql
 
 ### Common Error Response Structure
 
@@ -95,13 +96,8 @@ Example Error Response:
     ]
 }
 ```
-
-#### /api/user_graphql
-- 
+ 
 **currentUser**
-
-Endpoint: `/api/user_graphql`
-
 Example Query:
 ```graphql
 query {
@@ -127,9 +123,6 @@ Example Response:
 ```
 
 **createUser**
-
-Endpoint: `/api/user_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -163,9 +156,6 @@ Example Response:
 ```
 
 **requestPasswordReset**
-
-Endpoint: `/api/user_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -187,9 +177,6 @@ Example Response:
 ```
 
 **verifyPasswordReset**
-
-Endpoint: `/api/user_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -211,9 +198,6 @@ Example Response:
 ```
 
 **resetPassword**
-
-Endpoint: `/api/user_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -234,12 +218,7 @@ Example Response:
     }
 }
 ```
-
-### /api/auth_graphql
 **login**
-
-Endpoint: `/api/auth_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -286,9 +265,6 @@ Example Response:
 ```
 
 **refreshToken**
-
-Endpoint: `/api/auth_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -312,9 +288,6 @@ Example Response:
 ```
 
 **logout**
-
-Endpoint: `/api/auth_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -331,11 +304,7 @@ Example Response:
 }
 ```
 
-
-#### /api/stage_graphql
-
 **stages**
-Endpoint: `/api/stage_graphql`
 Example Mutation:
 ```graphql
 query {
@@ -398,9 +367,6 @@ Example Response:
 ```
 
 **stagebyid**
-
-Endpoint: `/api/stage_graphql`
-
 Example Query:
 ```graphql
 query {
@@ -433,9 +399,6 @@ Example Response:
 
 
 **createStage**
-
-Endpoint: `/api/stage_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -468,8 +431,6 @@ Example Response:
 
 **updateStage**
 
-Endpoint: `/api/stage_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -499,9 +460,6 @@ Example Response:
 ```
 
 **duplicateStage**
-
-Endpoint: `/api/stage_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -527,9 +485,6 @@ Example Response:
 ```
 
 **deleteStage**
-
-Endpoint: `/api/stage_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -553,9 +508,6 @@ Example Response:
 ```
 
 **assignMedia**
-
-Endpoint: `/api/stage_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -582,9 +534,6 @@ Example Response:
 ```
 
 **uploadMedia**
-
-Endpoint: `/api/stage_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -615,9 +564,6 @@ Example Response:
 ```
 
 **updateMedia**
-
-Endpoint: `/api/stage_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -647,9 +593,6 @@ Example Response:
 ```
 
 **deleteMedia**
-
-Endpoint: `/api/stage_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -673,8 +616,6 @@ Example Response:
 ```
 
 **assignStages**
-Endpoint: `/api/stage_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -701,9 +642,6 @@ Example Response:
 ```
 
 **sweepStage**
-
-Endpoint: `/api/stage_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -727,9 +665,6 @@ Example Response:
 ```
 
 **saveScene**
-
-Endpoint: `/api/stage_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -758,9 +693,6 @@ Example Response:
 ```
 
 **deleteScene**
-
-Endpoint: `/api/stage_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -784,9 +716,6 @@ Example Response:
 ```
 
 **updatePerformance**
-
-Endpoint: `/api/stage_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -813,9 +742,6 @@ Example Response:
 ```
 
 **deletePerformance**
-
-Endpoint: `/api/stage_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -839,9 +765,6 @@ Example Response:
 ```
 
 **startRecording**
-
-Endpoint: `/api/stage_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -870,9 +793,6 @@ Example Response:
 ```
 
 **saveRecording**
-
-Endpoint: `/api/stage_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -898,9 +818,6 @@ Example Response:
 ```
 
 **updateStatus**
-
-Endpoint: `/api/stage_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -922,9 +839,6 @@ Example Response:
 ```
 
 **updateVisibility**
-
-Endpoint: `/api/stage_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -946,9 +860,6 @@ Example Response:
 ```
 
 **updateLastAccess**
-
-Endpoint: `/api/stage_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -969,12 +880,7 @@ Example Response:
 }
 ```
 
-
-#### /api/email_graphql
 **sendEmailExternal**
-
-Endpoint: `/api/email_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -1002,12 +908,7 @@ Example Response:
 }
 ```
 
-
-#### /api/license_graphql
 **access**
-
-Endpoint: `/api/license_graphql`
-
 Example Query:
 ```graphql
 query {
@@ -1039,9 +940,6 @@ Example Response:
 ```
 
 **createLicense**
-
-Endpoint: `/api/license_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -1077,9 +975,6 @@ Example Response:
 ```
 
 **revokeLicense**
-
-Endpoint: `/api/license_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -1098,11 +993,7 @@ Example Response:
 }
 ```
 
-#### /api/performance_graphql
 **performanceCommunication**
-
-Endpoint: `/api/performance_graphql`
-
 Example Query:
 ```graphql
 query {
@@ -1146,9 +1037,6 @@ Example Response:
 ```
 
 **performanceConfig**
-
-Endpoint: `/api/performance_graphql`
-
 Example Query:
 ```graphql
 query {
@@ -1186,9 +1074,6 @@ Example Response:
 ```
 
 **scene**
-
-Endpoint: `/api/performance_graphql`
-
 Example Query:
 ```graphql
 query {
@@ -1226,9 +1111,6 @@ Example Response:
 ```
 
 **parentStage**
-
-Endpoint: `/api/performance_graphql`
-
 Example Query:
 ```graphql
 query {
@@ -1306,11 +1188,7 @@ Example Response:
     }
 }
 ```
-#### /api/config_graphql
 **nginx**
-
-Endpoint: `/api/config_graphql`
-
 Example Query:
 ```graphql
 query {
@@ -1332,9 +1210,6 @@ Example Response:
 ```
 
 **system**
-
-Endpoint: `/api/config_graphql`
-
 Example Query:
 ```graphql
 query {
@@ -1402,9 +1277,6 @@ Example Response:
 ```
 
 **foyer**
-
-Endpoint: `/api/config_graphql`
-
 Example Query:
 ```graphql
 query {
@@ -1472,9 +1344,6 @@ Example Response:
 ```
 
 **updateTermsOfService**
-
-Endpoint: `/api/config_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -1502,9 +1371,6 @@ Example Response:
 ```
 
 **saveConfig**
-
-Endpoint: `/api/config_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -1535,9 +1401,6 @@ Example Response:
 ```
 
 **sendEmail**
-
-Endpoint: `/api/config_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -1564,11 +1427,7 @@ Example Response:
     }
 }
 ```
-#### /api/payment_graphql
 **oneTimePurchase**
-
-Endpoint: `/api/payment_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -1598,9 +1457,6 @@ Example Response:
 ```
 
 **createSubscription**
-
-Endpoint: `/api/payment_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -1633,9 +1489,6 @@ Example Response:
 ```
 
 **cancelSubscription**
-
-Endpoint: `/api/payment_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -1659,9 +1512,6 @@ Example Response:
 ```
 
 **updateEmailCustomer**
-
-Endpoint: `/api/payment_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -1684,11 +1534,7 @@ Example Response:
 }
 ```
 
-### /api/studio_graphql
 **batchUserCreation**
-
-Endpoint: `/api/studio_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -1736,9 +1582,6 @@ Example Response:
 ```
 
 **updateUser**
-
-Endpoint: `/api/studio_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -1768,9 +1611,6 @@ Example Response:
 ```
 
 **deleteUser**
-
-Endpoint: `/api/studio_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -1794,9 +1634,6 @@ Example Response:
 ```
 
 **uploadFile**
-
-Endpoint: `/api/studio_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -1818,9 +1655,6 @@ Example Response:
 ```
 
 **saveMedia**
-
-Endpoint: `/api/studio_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -1860,9 +1694,6 @@ Example Response:
 ```
 
 **deleteMedia**
-
-Endpoint: `/api/studio_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -1886,9 +1717,6 @@ Example Response:
 ```
 
 **sendEmail**
-
-Endpoint: `/api/studio_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -1916,9 +1744,6 @@ Example Response:
 ```
 
 **changePassword**
-
-Endpoint: `/api/studio_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -1946,9 +1771,6 @@ Example Response:
 ```
 
 **calcSizes**
-
-Endpoint: `/api/studio_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -1970,9 +1792,6 @@ Example Response:
 ```
 
 **confirmPermission**
-
-Endpoint: `/api/studio_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -2022,9 +1841,6 @@ Example Response:
 ```
 
 **requestPermission**
-
-Endpoint: `/api/studio_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -2074,9 +1890,6 @@ Example Response:
 ```
 
 **quickAssignMutation**
-
-Endpoint: `/api/studio_graphql`
-
 Example Mutation:
 ```graphql
 mutation {
@@ -2100,9 +1913,6 @@ Example Response:
 ```
 
 **whoami**
-
-Endpoint: `/api/studio_graphql`
-
 Example Query:
 ```graphql
 query {
@@ -2128,9 +1938,6 @@ Example Response:
 ```
 
 **adminPlayers**
-
-Endpoint: `/api/studio_graphql`
-
 Example Query:
 ```graphql
 query {
@@ -2169,9 +1976,6 @@ Example Response:
 ```
 
 **media**
-
-Endpoint: `/api/studio_graphql`
-
 Example Query:
 ```graphql
 query {
@@ -2210,9 +2014,6 @@ Example Response:
 ```
 
 **mediaList**
-
-Endpoint: `/api/studio_graphql`
-
 Example Query:
 ```graphql
 query {
@@ -2245,9 +2046,6 @@ Example Response:
 ```
 
 **tags**
-
-Endpoint: `/api/studio_graphql`
-
 Example Query:
 ```graphql
     query {
@@ -2276,8 +2074,6 @@ Example Response:
 ```
 
 **mediaTypes**
-Endpoint: `/api/studio_graphql`
-
 Example Query:
 ```graphql
     query {
@@ -2303,8 +2099,6 @@ Example Response:
 ```
 
 **users**
-Endpoint: `/api/studio_graphql`
-
 Example Query:
 ```graphql
     query {
@@ -2331,13 +2125,11 @@ Example Response:
 }
 ```
 
-**stages**
-Endpoint: `/api/studio_graphql`
-
+**getAllStagesInStudio**
 Example Query:
 ```graphql
     query {
-        stages {
+        getAllStages {
             id
             username
             displayName
@@ -2349,7 +2141,7 @@ Example Response:
 ```json
 {
  "data": {
-    "stages": [
+    "getAllStages": [
       {
         "id": "2",
         "name": "Stage Name",
@@ -2366,7 +2158,6 @@ Example Response:
 
 
 **foyerStageList**
-Endpoint: `/api/stage_graphql`
 
 Example Query:
 ```graphql
