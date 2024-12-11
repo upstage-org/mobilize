@@ -1,9 +1,9 @@
 from ariadne import MutationType, QueryType, make_executable_schema
 
 from global_config import authenticated
-from upstage_options.http.validation import ConfigInput, EmailInput
+from upstage_options.http.validation import ConfigInput, SystemEmailInput
 from upstage_options.services.upstage_option import SettingService
-from upstage_options.http.graphql import type_defs
+from studios.http.graphql import type_defs
 from ariadne.asgi import GraphQL
 
 from users.db_models.user import ADMIN, SUPER_ADMIN
@@ -39,10 +39,10 @@ async def save_config(*_, input: ConfigInput):
     return SettingService().save_config(ConfigInput(**input))
 
 
-@mutation.field("sendEmail")
+@mutation.field("sendSystemEmail")
 @authenticated(allowed_roles=[ADMIN, SUPER_ADMIN])
-async def send_email(*_, input: EmailInput):
-    return await SettingService().send_email(EmailInput(**input))
+async def send_email(*_, input: SystemEmailInput):
+    return await SettingService().send_email(SystemEmailInput(**input))
 
 
 schema = make_executable_schema(type_defs, query, mutation)

@@ -7,7 +7,7 @@ from global_config import (
 )
 from mails.helpers.mail import send
 from upstage_options.db_models.config import ConfigModel
-from upstage_options.http.validation import ConfigInput, EmailInput
+from upstage_options.http.validation import ConfigInput, SystemEmailInput
 
 TERMS_OF_SERVICE = "TERMS_OF_SERVICE"
 MANUAL = "MANUAL"
@@ -87,7 +87,7 @@ class SettingService:
         config = self.get_config(input.name)
         return convert_keys_to_camel_case(config)
 
-    async def send_email(self, input: EmailInput):
+    async def send_email(self, input: SystemEmailInput):
         await send(
             input.recipients.split(","),
             input.subject,

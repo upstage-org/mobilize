@@ -1,6 +1,6 @@
 from ariadne import MutationType, QueryType, make_executable_schema
 from global_config import convert_keys_to_camel_case, authenticated
-from users.http.graphql import type_defs
+from studios.http.graphql import type_defs
 from ariadne.asgi import GraphQL
 
 from users.http.validation import CreateUserInput

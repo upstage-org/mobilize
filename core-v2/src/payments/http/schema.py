@@ -1,5 +1,5 @@
 from ariadne import MutationType, QueryType, make_executable_schema
-from payments.http.graphql import type_defs
+from studios.http.graphql import type_defs
 from ariadne.asgi import GraphQL
 from payments.services.payment import PaymentService
 from payments.http.validation import OneTimePurchaseInput, CreateSubscriptionInput

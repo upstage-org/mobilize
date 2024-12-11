@@ -4,7 +4,7 @@ from performance_config.services.performance import PerformanceService
 from performance_config.services.scene import SceneService
 from stages.services.stage import StageService
 from ariadne.asgi import GraphQL
-from performance_config.http.graphql import type_defs
+from studios.http.graphql import type_defs
 
 
 query = QueryType()

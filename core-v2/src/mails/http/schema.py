@@ -1,6 +1,6 @@
 from ariadne import MutationType, QueryType, make_executable_schema
 from graphql import GraphQLError
-from mails.http.graphql import type_defs
+from studios.http.graphql import type_defs
 from ariadne.asgi import GraphQL
 
 from mails.helpers.mail import create_email, send_async, valid_token

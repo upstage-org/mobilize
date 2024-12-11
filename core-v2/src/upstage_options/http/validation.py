@@ -7,7 +7,7 @@ class ConfigInput(BaseModel):
     value: str = Field(..., description="The value of the configuration")
 
 
-class EmailInput(BaseModel):
+class SystemEmailInput(BaseModel):
     subject: str = Field(..., description="The subject of the email")
     body: str = Field(..., description="The body of the email")
     recipients: str = Field(..., description="The recipient of the email")

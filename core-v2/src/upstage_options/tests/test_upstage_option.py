@@ -189,8 +189,8 @@ class TestUpStageOptionsController:
     async def test_06_send_email(self, client):
         headers = test_AuthenticationController.get_headers(client, SUPER_ADMIN)
         query = """
-            mutation ($input: EmailInput!) {
-                sendEmail(input: $input) {
+            mutation ($input: SystemEmailInput!) {
+                sendSystemEmail(input: $input) {
                     success
                 }   
             }
@@ -212,6 +212,6 @@ class TestUpStageOptionsController:
         )
 
         assert response.status_code == 200
-        data = response.json()["data"]["sendEmail"]
+        data = response.json()["data"]["sendSystemEmail"]
         assert "success" in data
         assert "errors" not in response.json()

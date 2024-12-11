@@ -2,9 +2,7 @@ from ariadne import MutationType, QueryType, make_executable_schema
 from ariadne.asgi import GraphQL
 from authentication.http.validation import LoginInput
 from authentication.services.auth import AuthenticationService
-from global_config import authenticated
-from users.db_models.user import UserModel
-from authentication.http.graphql import type_defs
+from studios.http.graphql import type_defs
 
 
 query = QueryType()

@@ -1,3 +1,4 @@
+import random
 from src.main import app
 from global_config import global_session, JWT_HEADER_NAME
 import pytest
@@ -50,7 +51,7 @@ class TestAuthenticationController:
         assert data["errors"][0]["message"] == "Incorrect username or password"
 
     async def test_02_login_successfully(self, client):
-        email = Faker().email()
+        email = f"{random.randint(1, 1000)}{Faker().email()}"
         user = UserModel(
             username=email,
             password=encrypt(f"testpassword"),
@@ -74,7 +75,7 @@ class TestAuthenticationController:
         return data
 
     async def test_player_login_successfully(self, client):
-        email = Faker().email()
+        email = f"{random.randint(1, 1000)}{Faker().email()}"
         user = UserModel(
             username=email,
             password=encrypt(f"testpassword"),
@@ -98,7 +99,7 @@ class TestAuthenticationController:
         return data
 
     async def test_03_refresh_token_successfully(self, client):
-        email = Faker().email({"locale": "en_US"})
+        email = f"{random.randint(1, 1000)}{Faker().email()}"
         user = UserModel(
             username=email,
             password=encrypt(f"testpassword"),
@@ -138,10 +139,10 @@ class TestAuthenticationController:
         assert response.status_code == 200
         data = response.json()
         assert "errors" in data
-        assert data["errors"][0]["message"] == "Authenticated Failed"
+        assert data["errors"][0]["message"] == "Invalid refresh token"
 
     async def test_05_logout(self, client):
-        email = Faker().email({"locale": "en_US"})
+        email = f"{random.randint(1, 1000)}{Faker().email()}"
         user = UserModel(
             username=email,
             password=encrypt(f"testpassword"),
@@ -193,7 +194,7 @@ class TestAuthenticationController:
         assert data["errors"][0]["message"] == "Invalid access token"
 
     def get_headers(self, client, role):
-        email = Faker().email({"locale": "en_US"})
+        email = f"{random.randint(1, 1000)}{Faker().email()}"
         user = UserModel(
             username=email,
             password=encrypt(f"testpassword"),

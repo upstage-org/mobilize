@@ -46,7 +46,7 @@ class TestLicenseController:
         license = DBSession.query(AssetLicenseModel).first()
         query = """
             mutation($id: ID!) {
-            revokeLicense(id: $id)
+                revokeLicense(id: $id)
             }
         """
 
@@ -67,5 +67,5 @@ class TestLicenseController:
         assert response.json()["data"][
             "revokeLicense"
         ] == "Failed to revoke license {}".format(license.id)
-        license = DBSession.query(AssetLicenseModel).first()
+        license = DBSession.query(AssetLicenseModel).filter_by(id=license.id).first()
         assert license is None

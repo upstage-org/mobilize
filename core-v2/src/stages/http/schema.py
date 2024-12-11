@@ -2,7 +2,7 @@ from ariadne import MutationType, QueryType, make_executable_schema
 from global_config import authenticated
 from performance_config.services.performance import PerformanceService
 from performance_config.services.scene import SceneService
-from stages.http.graphql import type_defs
+from studios.http.graphql import type_defs
 from ariadne.asgi import GraphQL
 
 from stages.http.validation import (
@@ -88,7 +88,7 @@ def assign_media(_, info, input: AssignMediaInput):
 
 @mutation.field("uploadMedia")
 @authenticated(allowed_roles=[SUPER_ADMIN, ADMIN, PLAYER])
-def assign_media(_, info, input: UploadMediaInput):
+def upload_media(_, info, input: UploadMediaInput):
     return MediaService().upload_media(
         UserModel(**info.context["request"].state.current_user),
         UploadMediaInput(**input),
@@ -103,7 +103,7 @@ def update_media(_, info, input: UpdateMediaInput):
     )
 
 
-@mutation.field("deleteMedia")
+@mutation.field("deleteMediaOnStage")
 @authenticated(allowed_roles=[SUPER_ADMIN, ADMIN, PLAYER])
 def delete_media(_, info, id: int):
     return MediaService().delete_media(id)

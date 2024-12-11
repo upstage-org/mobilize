@@ -1,3 +1,4 @@
+import random
 from faker import Faker
 import pytest
 from authentication.tests.auth_test import TestAuthenticationController
@@ -26,19 +27,24 @@ class TestStudioController:
                     users {
                         username
                         email
+                        role
+                        firstName
+                        lastName
+                        createdOn
                     }
                 }
             }
         """
-        email = Faker().email()
+        email = f"{random.randint(1, 1000)}{Faker().email()}"
+        username = f"test_user_{random.randint(1, 1000)}"
 
         variables = {
             "users": [
-                {"username": "test_user_1", "password": "password", "email": email},
+                {"username": username, "password": "password", "email": email},
                 {
-                    "username": "test_user_2",
+                    "username": f"test_user_{random.randint(1, 1000)}",
                     "password": "password",
-                    "email": Faker().email(),
+                    "email": f"{random.randint(1, 1000)}{Faker().email()}",
                 },
             ],
         }
@@ -57,9 +63,9 @@ class TestStudioController:
         variables = {
             "users": [
                 {
-                    "username": "test_user_1",
+                    "username": username,
                     "password": "password",
-                    "email": Faker().email(),
+                    "email": f"{random.randint(1, 1000)}{Faker().email()}",
                 },
             ],
         }
@@ -90,16 +96,14 @@ class TestStudioController:
         assert "errors" in response.json()
 
     async def test_02_update_user(self, client):
+        username = None
         with ScopedSession() as session:
-            user = session.query(UserModel).filter_by(username="test_user_1").first()
+            user = session.query(UserModel).first()
             user.active = False
+            username = user.username
             session.flush()
 
-        user = (
-            DBSession.query(UserModel)
-            .filter(UserModel.username == "test_user_1")
-            .first()
-        )
+        user = DBSession.query(UserModel).filter(UserModel.username == username).first()
 
         headers = test_AuthenticationController.get_headers(client, SUPER_ADMIN)
         query = """
@@ -114,9 +118,9 @@ class TestStudioController:
         variables = {
             "input": {
                 "id": user.id,
-                "username": "updated_user",
+                "username": f"test_user_{random.randint(1, 1000)}",
                 "password": "new_password",
-                "email": Faker().email(),
+                "email": f"{random.randint(1, 1000)}{Faker().email()}",
                 "binName": "new_bin",
                 "role": SUPER_ADMIN,
                 "firstName": "Updated",
@@ -188,7 +192,7 @@ class TestStudioController:
 
         user_2 = (
             DBSession.query(UserModel)
-            .filter(UserModel.username == "test_user_2")
+            .filter(UserModel.username == "test_user_4")
             .first()
         )
 

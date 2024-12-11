@@ -7,6 +7,7 @@ from assets.tests.asset_test import TestAssetController, load_base64_from_image
 from src.main import app
 from stages.http.schema import stage_graphql_app
 from users.db_models.user import SUPER_ADMIN
+import random
 
 app.mount("/stage_graphql", stage_graphql_app)
 test_AuthenticationController = TestAuthenticationController()
@@ -94,8 +95,8 @@ class TestMediaController:
         headers = test_AuthenticationController.get_headers(client, SUPER_ADMIN)
         await test_AssetController.test_03_save_media_successfully(client)
         asset = DBSession.query(AssetModel).first()
-
-        response = self.update_media(client, headers, asset.id)
+        file_location = f"image/test{random.randint(1, 1000)}.png"
+        response = self.update_media(client, headers, asset.id, file_location)
         assert response.status_code == 200
         assert "data" in response.json()
         assert "updateMedia" in response.json()["data"]
@@ -107,7 +108,7 @@ class TestMediaController:
         assert "errors" in response.json()
 
         asset = DBSession.query(AssetModel).all()[1]
-        response = self.update_media(client, headers, asset.id)
+        response = self.update_media(client, headers, asset.id, file_location)
         assert "errors" in response.json()
 
     def update_media(self, client, headers, id, file_location="image/test.png"):
@@ -145,10 +146,12 @@ class TestMediaController:
     async def test_05_delete_media(self, client):
         headers = test_AuthenticationController.get_headers(client, SUPER_ADMIN)
         asset = DBSession.query(AssetModel).first()
-        self.update_media(client, headers, asset.id, "image/test2.png")
+        self.update_media(
+            client, headers, asset.id, f"image/test{random.randint(1, 1000)}.png"
+        )
 
         response = self.delete_media_request(client, headers, asset)
-        assert response.json()["data"]["deleteMedia"]["success"] == True
+        assert response.json()["data"]["deleteMediaOnStage"]["success"] == True
 
     async def test_06_delete_media_not_found(self, client):
         headers = test_AuthenticationController.get_headers(client, SUPER_ADMIN)
@@ -160,8 +163,8 @@ class TestMediaController:
         variables = {"id": asset.id}
 
         query = """
-            mutation deleteMedia($id: ID!) {
-                deleteMedia(id: $id) {
+            mutation deleteMediaOnStage($id: ID!) {
+                deleteMediaOnStage(id: $id) {
                         success
                     }
                 }
@@ -175,7 +178,7 @@ class TestMediaController:
 
         assert response.status_code == 200
         assert "data" in response.json()
-        assert "deleteMedia" in response.json()["data"]
+        assert "deleteMediaOnStage" in response.json()["data"]
         return response
 
     async def assign_stages(self, client, headers, stage_ids, media_id):

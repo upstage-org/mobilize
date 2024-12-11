@@ -3,7 +3,7 @@ from authentication.tests.auth_test import TestAuthenticationController
 from src.main import app
 from global_config import JWT_HEADER_NAME
 from users.http.schema import user_graphql_app
-from mails.http.shema import mail_graphql_app
+from mails.http.schema import mail_graphql_app
 from faker import Faker
 
 app.mount("/user_graphql", user_graphql_app)

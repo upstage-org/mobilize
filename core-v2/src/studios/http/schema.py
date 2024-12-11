@@ -26,7 +26,7 @@ def admin_players(_, __, **kwargs):
     return StudioService().admin_players(kwargs)
 
 
-@query.field("stages")
+@query.field("getAllStages")
 @authenticated()
 def stages(_, __):
     return StudioService().stages()
