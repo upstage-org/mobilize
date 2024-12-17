@@ -11,7 +11,12 @@ from assets.db_models.asset_usage import AssetUsageModel
 from assets.db_models.media_tag import MediaTagModel
 from assets.services.asset import AssetService
 from assets.services.asset_license import AssetLicenseService
-from global_config import DBSession, ScopedSession, convert_keys_to_camel_case
+from global_config import (
+    DBSession,
+    ScopedSession,
+    convert_keys_to_camel_case,
+    validate_file_size,
+)
 from stages.db_models.parent_stage import ParentStageModel
 from stages.db_models.stage import StageModel
 from stages.http.validation import (
@@ -53,14 +58,20 @@ class MediaService:
         with ScopedSession() as local_db_session:
             asset_type = self.asset_service.validate_asset_type(input, local_db_session)
 
-            filename, file_extension = os.path.splitext(input.name)
-            unique_filename = uuid.uuid4().hex + file_extension
+            filename, file_extension = os.path.splitext(input.filename)
+
+            unique_filename = uuid.uuid4().hex + filename + file_extension
 
             media_directory = os.path.join(
                 absolutePath, storagePath, asset_type.file_location
             )
             if not os.path.exists(media_directory):
                 os.makedirs(media_directory)
+
+            file_data = b64decode(input.base64.split(",")[1])
+            file_size = len(file_data)
+            validate_file_size(file_extension, file_size)
+
             with open(os.path.join(media_directory, unique_filename), "wb") as fh:
                 fh.write(b64decode(input.base64.split(",")[1]))
 

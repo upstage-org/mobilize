@@ -403,3 +403,26 @@ class TestAssetController:
 
         asset = DBSession.query(AssetModel).filter_by(id=asset.id).first()
         assert asset is None
+
+    async def test_11_upload_file_with_large_file(self, client):
+        data = await test_AuthenticationController.test_02_login_successfully(client)
+
+        headers = {
+            "Authorization": f'Bearer {data["data"]["login"]["access_token"]}',
+            JWT_HEADER_NAME: data["data"]["login"]["refresh_token"],
+        }
+
+        variables = {
+            "base64": f"data:image/jpeg;base64,{load_base64_from_image('src/assets/tests/images/large-file.jpg')}",
+            "filename": "large-file.jpg",
+        }
+        response = client.post(
+            "/asset_graphql",
+            json={"query": self.mutation_query, "variables": variables},
+            headers=headers,
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert "data" in data
+        assert "errors" in data
+        assert data["errors"][0]["message"] == "Image files must be under 1MB."

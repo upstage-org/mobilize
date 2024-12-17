@@ -24,6 +24,7 @@ from assets.db_models.asset_usage import AssetUsageModel
 from assets.db_models.media_tag import MediaTagModel
 from assets.db_models.tag import TagModel
 from assets.http.validation import MediaTableInput, SaveMediaInput
+from global_config import validate_file_size
 from stages.db_models.parent_stage import ParentStageModel
 from users.db_models.user import ADMIN, SUPER_ADMIN, UserModel
 
@@ -115,13 +116,17 @@ class AssetService:
 
     def upload_file(self, base64: str, filename: str):
         filename, file_extension = os.path.splitext(filename)
-        unique_filename = uuid.uuid4().hex + file_extension
+        unique_filename = uuid.uuid4().hex + filename + file_extension
         subpath = "media"
         media_directory = os.path.join(absolutePath, storagePath, subpath)
         if not os.path.exists(media_directory):
             os.makedirs(media_directory)
+        file_data = b64decode(base64.split(",")[1])
+        file_size = len(file_data)
+        validate_file_size(file_extension, file_size)
+
         with open(os.path.join(media_directory, unique_filename), "wb") as fh:
-            fh.write(b64decode(base64.split(",")[1]))
+            fh.write(file_data)
 
         file_location = os.path.join(subpath, unique_filename)
         return {"url": file_location}

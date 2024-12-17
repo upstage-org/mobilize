@@ -115,12 +115,15 @@ class TestStudioController:
             }
         """
 
+        email = f"{random.randint(1, 1000)}{Faker().email()}"
+        username = f"test_user_{random.randint(1, 1000)}"
+
         variables = {
             "input": {
                 "id": user.id,
-                "username": f"test_user_{random.randint(1, 1000)}",
+                "username": username,
                 "password": "new_password",
-                "email": f"{random.randint(1, 1000)}{Faker().email()}",
+                "email": email,
                 "binName": "new_bin",
                 "role": SUPER_ADMIN,
                 "firstName": "Updated",
@@ -190,11 +193,7 @@ class TestStudioController:
         assert response.status_code == 200
         assert "errors" in response.json()
 
-        user_2 = (
-            DBSession.query(UserModel)
-            .filter(UserModel.username == "test_user_4")
-            .first()
-        )
+        user_2 = DBSession.query(UserModel).all()[-1]
 
         variables = {
             "input": {
