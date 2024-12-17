@@ -3,19 +3,13 @@
     <template #render>
       <Loading v-if="!videoTrack && !audioTrack" height="100%" />
       <template v-else>
-        <video
-          autoplay
-          ref="videoEl"
-          :style="{
-            'border-radius': object.shape === 'circle' ? '100%' : '12px',
-          }"
-        ></video>
+        <video autoplay ref="videoEl" :style="{
+          'border-radius': object.shape === 'circle' ? '100%' : '12px',
+        }" @timeupdate="timeupdate">
+          Please click on Reload Stream button.
+        </video>
         <audio autoplay ref="audioEl" :muted="localMuted"></audio>
-        <button
-          v-if="isPlayer"
-          class="button is-small mute-icon clickable"
-          @mousedown="toggleMuted"
-        >
+        <button v-if="isPlayer" class="button is-small mute-icon clickable" @mousedown="toggleMuted">
           <i v-if="localMuted" class="fas fa-volume-mute has-text-danger"></i>
           <i v-else class="fas fa-volume-up has-text-primary"></i>
         </button>
@@ -58,20 +52,26 @@ export default {
     const store = useStore();
     const videoEl = ref();
     const audioEl = ref();
+
     const tracks = computed(() =>
       store.getters["stage/jitsiTracks"].filter(
         (t) => t.getParticipantId() === props.object.participantId,
       ),
     );
-    const videoTrack = computed(() =>
-      tracks.value.find((t) => t.type === "video"),
-    );
-    const audioTrack = computed(() =>
-      tracks.value.find((t) => t.type === "audio"),
-    );
-
+    const reloadStreams = computed(() => store.getters["stage/reloadStreams"]);
+    const videoTrack = computed(() => {
+      const vTracks = tracks.value.filter((t) => t.type === "video")
+      if (vTracks.find(t => t.stream.active)) return vTracks.find(t => t.stream.active)
+      return vTracks[0]
+    });
+    const audioTrack = computed(() => {
+      const aTracks = tracks.value.filter((t) => t.type === "audio")
+      if (aTracks.find(t => t.stream.active)) return aTracks.find(t => t.stream.active)
+      return aTracks[0]
+    });
     const loadTrack = () => {
       if (tracks.value.length) {
+        console.log("~~~~~~~~~~~~~~~~~~~~~~~~~")
         try {
           if (videoTrack.value) {
             videoTrack.value.attach(videoEl.value);
@@ -85,6 +85,7 @@ export default {
       }
     };
 
+    const interval = setInterval(loadTrack, 3000);
     const joined = inject("joined");
     const jitsi = inject("jitsi");
 
@@ -104,7 +105,17 @@ export default {
       { immediate: true },
     );
 
-    onMounted(loadTrack);
+    watch(
+      reloadStreams,
+      (val) => {
+        if (val) {
+          loadTrack();
+        }
+      },
+      { immediate: true },
+    );
+
+    onMounted(() => loadTrack);
 
     const clip = (shape) => {
       store.dispatch("stage/shapeObject", {
@@ -119,6 +130,9 @@ export default {
     };
     const isPlayer = computed(() => store.getters["stage/canPlay"]);
 
+    const timeupdate = (e) => {
+      interval && clearInterval(interval);
+    }
     return {
       videoTrack,
       audioTrack,
@@ -128,6 +142,9 @@ export default {
       localMuted,
       toggleMuted,
       isPlayer,
+
+      timeupdate,
+      loadTrack
     };
   },
 };
@@ -140,6 +157,19 @@ video {
 </style>
 
 <style lang="scss" scoped>
+.refresh-icon {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  top: 8px;
+  right: 8px;
+  padding: 0px;
+
+  &:hover {
+    transform: scale(1.2);
+  }
+}
+
 .mute-icon {
   position: absolute;
   width: 24px;

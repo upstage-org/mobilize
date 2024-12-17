@@ -103,7 +103,7 @@ export default {
   save_as_avatar: "Lưu làm hình đại diện",
   save_as_prop: "Lưu dưới dạng Đề xuất",
   new_drawing: "Bản vẽ mới",
-  new_room: "Phòng mới",
+  new_room: "Create Meeting",
   blank_scene: "Cảnh trống",
   delete_scene: "Xóa cảnh",
   hide_reactions: "Ẩn phản ứng",
@@ -188,4 +188,6 @@ export default {
   },
   studio: "Studio",
   display_name: "Tên hiển thị",
+  new_stream: "My Stream",
+  default_backgroundcolor: "Default Background Colour"
 };

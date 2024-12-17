@@ -192,7 +192,6 @@ export default {
     };
 
     const refreshStreams = () => {
-      store.dispatch("stage/getRunningStreams");
       let video = document.getElementById("video" + props.stream.id);
       if (stream.isPlaying && video) {
         const fullUrl = computed(() => getSubsribeLink("your_stream_key"));

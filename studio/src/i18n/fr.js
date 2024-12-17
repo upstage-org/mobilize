@@ -129,7 +129,7 @@ export default {
   save_as_avatar: "Enregistrer comme avatar",
   save_as_prop: "Enregistrer comme costume",
   new_drawing: "Nouveau dessin",
-  new_room: "Nouveau salon",
+  new_room: "Create Meeting",
   blank_scene: "Scène vide",
   delete_scene: "Supprimer la Scène",
   hide_reactions: "Cacher les réactions",
@@ -225,4 +225,6 @@ export default {
   profile_title: "{name}'s Profile",
   introduction: "Introduction",
   new_object: "Nouveau {0}",
+  new_stream: "My Stream",
+  default_backgroundcolor: "Default Background Colour"
 };

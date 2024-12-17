@@ -50,16 +50,10 @@ export default {
     const store = useStore();
     const runningStreams = computed(() => store.state.stage.runningStreams);
     const loading = computed(() => store.state.stage.loadingRunningStreams);
-    const fetchRunningStreams = () => {
-      store.dispatch("stage/getRunningStreams");
-    };
 
     const autoDetect = computed(
       () => store.state.stage.config.streaming?.autoDetect,
     );
-    onMounted(() => {
-      //fetchRunningStreams();
-    });
 
     const streams = computed(() => {
       const res = [...store.state.stage.tools.streams];

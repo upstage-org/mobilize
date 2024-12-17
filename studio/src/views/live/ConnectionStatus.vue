@@ -1,12 +1,10 @@
 <template>
   <div id="connection-status">
-    <span
-      class="tag is-light is-small"
-      :class="{
-        'is-danger': status === 'LIVE',
-        'is-warning': status === 'CONNECTING',
-      }"
-    >
+    <span class="tag is-light is-small" :class="{
+      'is-danger': status === 'LIVE',
+      'is-warning': status === 'CONNECTING',
+      'is-rehearsal': masquerading
+    }">
       <template v-if="replaying">
         <span class="icon">
           <i ref="dot" class="fas fa-circle"></i>
@@ -14,13 +12,13 @@
         <span class="status-text">{{ $t("replaying") }}</span>
       </template>
       <template v-else>
-        <span class="icon" v-show="status !== 'OFFLINE'">
+        <span class="icon" v-show="masquerading || status !== 'OFFLINE'">
           <i ref="dot" class="fas fa-circle"></i>
         </span>
         <span class="icon" v-show="status === 'OFFLINE'">
           <i class="far fa-circle"></i>
         </span>
-        <span class="status-text">{{ status }}</span>
+        <span class="status-text">{{ masquerading ? "REHEARSAL" : status }}</span>
       </template>
     </span>
 
@@ -39,11 +37,7 @@
       </template>
       <div style="max-height: 50vh; overflow-y: auto">
         <Session v-for="player in players" :key="player" :session="player" />
-        <Session
-          v-for="audience in audiences"
-          :key="audience"
-          :session="audience"
-        />
+        <Session v-for="audience in audiences" :key="audience" :session="audience" />
       </div>
     </Popover>
   </div>
@@ -64,6 +58,7 @@ export default {
     const status = computed(() => store.state.stage.status);
     const players = computed(() => store.getters["stage/players"]);
     const audiences = computed(() => store.getters["stage/audiences"]);
+    const masquerading = computed(() => store.state.stage.masquerading);
     const replaying = inject("replaying");
 
     onMounted(() => {
@@ -81,6 +76,7 @@ export default {
       players,
       audiences,
       replaying,
+      masquerading
     };
   },
 };
@@ -100,5 +96,14 @@ export default {
     top: 8px;
     left: 0;
   }
+}
+
+.is-rehearsal {
+  background-color: #feecf0 !important;
+  color: #0000ff !important;
+}
+
+.status-text {
+  margin-top: 4px;
 }
 </style>

@@ -128,7 +128,7 @@ export default {
   save_as_avatar: "Spara som Avatar",
   save_as_prop: "Spara som Prop",
   new_drawing: "Ny Dragning",
-  new_room: "Nya Rum",
+  new_room: "Create Meeting",
   blank_scene: "Tom Scen",
   delete_scene: "Stryk Scenen",
   hide_reactions: "Dölj reaktioner",
@@ -225,4 +225,6 @@ export default {
   profile_title: "{name}s Profil",
   introduction: "Inledning",
   new_object: "Ny {0}",
+  new_stream: "My Stream",
+  default_backgroundcolor: "Default Background Colour"
 };

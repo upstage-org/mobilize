@@ -215,7 +215,7 @@ export default {
   left: 56px;
   bottom: 16px;
   height: 230px;
-  max-width: unset;
+  max-width: 222px;
   overflow: visible;
   z-index: 3;
 
