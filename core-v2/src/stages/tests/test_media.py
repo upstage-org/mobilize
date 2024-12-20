@@ -95,7 +95,7 @@ class TestMediaController:
         headers = test_AuthenticationController.get_headers(client, SUPER_ADMIN)
         await test_AssetController.test_03_save_media_successfully(client)
         asset = DBSession.query(AssetModel).first()
-        file_location = f"image/test{random.randint(1, 1000)}.png"
+        file_location = f"image/test2.png"
         response = self.update_media(client, headers, asset.id, file_location)
         assert response.status_code == 200
         assert "data" in response.json()

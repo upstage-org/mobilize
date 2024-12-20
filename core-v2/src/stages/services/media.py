@@ -15,8 +15,8 @@ from global_config import (
     DBSession,
     ScopedSession,
     convert_keys_to_camel_case,
-    validate_file_size,
 )
+from files.file_handling import FileHandling
 from stages.db_models.parent_stage import ParentStageModel
 from stages.db_models.stage import StageModel
 from stages.http.validation import (
@@ -36,6 +36,7 @@ class MediaService:
     def __init__(self):
         self.asset_service = AssetService()
         self.asset_license_service = AssetLicenseService()
+        self.file_handling = FileHandling()
 
     def assign_media(self, input: AssignMediaInput):
         with ScopedSession() as local_db_session:
@@ -57,25 +58,13 @@ class MediaService:
     def upload_media(self, user: UserModel, input: UploadMediaInput):
         with ScopedSession() as local_db_session:
             asset_type = self.asset_service.validate_asset_type(input, local_db_session)
-
-            filename, file_extension = os.path.splitext(input.filename)
-
-            unique_filename = uuid.uuid4().hex + filename + file_extension
-
-            media_directory = os.path.join(
-                absolutePath, storagePath, asset_type.file_location
+            file_location = self.file_handling.upload_file(
+                base64=input.base64,
+                file_name=input.filename,
+                absolute_path=absolutePath,
+                storage_path=storagePath,
+                sub_path=asset_type.file_location,
             )
-            if not os.path.exists(media_directory):
-                os.makedirs(media_directory)
-
-            file_data = b64decode(input.base64.split(",")[1])
-            file_size = len(file_data)
-            validate_file_size(file_extension, file_size)
-
-            with open(os.path.join(media_directory, unique_filename), "wb") as fh:
-                fh.write(b64decode(input.base64.split(",")[1]))
-
-            file_location = os.path.join(asset_type.file_location, unique_filename)
 
             asset = self.asset_service.create_asset(
                 owner=user,
@@ -103,12 +92,10 @@ class MediaService:
             asset.file_location = file_location
 
             if input.base64:
-                media_directory = os.path.join(
-                    absolutePath, storagePath, asset.file_location
+                self.file_handling.write_file(
+                    base64=input.base64,
+                    path=os.path.join(absolutePath, storagePath, asset.file_location),
                 )
-
-                with open(media_directory, "wb") as fh:
-                    fh.write(b64decode(input.base64.split(",")[1]))
 
             self.asset_license_service.create(
                 asset_id=asset.id,
@@ -156,16 +143,17 @@ class MediaService:
                 attributes["frames"] = []
 
             for frame in input.uploadedFrames:
-                unique_filename = uuid.uuid4().hex + file_extension
-                media_directory = os.path.join(
-                    absolutePath, storagePath, asset_type.file_location
-                )
-                if not os.path.exists(media_directory):
-                    os.makedirs(media_directory)
-                with open(os.path.join(media_directory, unique_filename), "wb") as fh:
-                    fh.write(b64decode(frame.split(",")[1]))
+                filename = uuid.uuid4().hex + file_extension
 
-                frame_location = os.path.join(asset_type.file_location, unique_filename)
+                frame_location = self.file_handling.upload_file(
+                    base64=frame,
+                    file_name=filename,
+                    absolute_path=absolutePath,
+                    storage_path=storagePath,
+                    sub_path=asset_type.file_location,
+                )
+
+                frame_location = os.path.join(asset_type.file_location, filename)
                 attributes["frames"].append(frame_location)
 
             return json.dumps(attributes)
@@ -179,8 +167,7 @@ class MediaService:
                 local_db_session, asset
             )
 
-            if os.path.exists(physical_path):
-                os.remove(physical_path)
+            self.file_handling.delete_file(physical_path)
 
             self.cleanup_related_entities(id, local_db_session)
             self.remove_asset_from_frames(local_db_session, asset)
@@ -207,9 +194,7 @@ class MediaService:
                 .first()
             )
             if not frame_asset:
-                physical_path = os.path.join(absolutePath, storagePath, frame)
-                if os.path.exists(physical_path):
-                    os.remove(physical_path)
+                self.file_handling.delete_file( os.path.join(absolutePath, storagePath, frame))
 
     def _get_physical_path(self, file_location):
         return os.path.join(absolutePath, storagePath, file_location)

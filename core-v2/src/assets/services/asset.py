@@ -24,9 +24,10 @@ from assets.db_models.asset_usage import AssetUsageModel
 from assets.db_models.media_tag import MediaTagModel
 from assets.db_models.tag import TagModel
 from assets.http.validation import MediaTableInput, SaveMediaInput
-from global_config import validate_file_size
 from stages.db_models.parent_stage import ParentStageModel
 from users.db_models.user import ADMIN, SUPER_ADMIN, UserModel
+from files.file_handling import FileHandling
+
 
 appdir = os.path.abspath(os.path.dirname(__file__))
 absolutePath = os.path.dirname(appdir)
@@ -35,6 +36,7 @@ storagePath = "../../uploads/assets"
 
 class AssetService:
     def __init__(self):
+        self.file_handing = FileHandling()
         pass
 
     def get_all_medias(self, user: UserModel, filter: dict = None):
@@ -115,20 +117,9 @@ class AssetService:
         return convert_keys_to_camel_case({"totalCount": total_count, "edges": assets})
 
     def upload_file(self, base64: str, filename: str):
-        filename, file_extension = os.path.splitext(filename)
-        unique_filename = uuid.uuid4().hex + filename + file_extension
-        subpath = "media"
-        media_directory = os.path.join(absolutePath, storagePath, subpath)
-        if not os.path.exists(media_directory):
-            os.makedirs(media_directory)
-        file_data = b64decode(base64.split(",")[1])
-        file_size = len(file_data)
-        validate_file_size(file_extension, file_size)
-
-        with open(os.path.join(media_directory, unique_filename), "wb") as fh:
-            fh.write(file_data)
-
-        file_location = os.path.join(subpath, unique_filename)
+        file_location = self.file_handing.upload_file(
+            base64, filename, absolutePath, storagePath, "media"
+        )
         return {"url": file_location}
 
     def save_media(self, owner: UserModel, input: SaveMediaInput):
@@ -391,10 +382,8 @@ class AssetService:
                         )
                         .first()
                     )
-                    if frame_asset:
-                        physical_path = os.path.join(absolutePath, storagePath, frame)
-                        if os.path.exists(physical_path):
-                            os.remove(physical_path)
+                    if not frame_asset:
+                        self.file_handing.delete_file(os.path.join(absolutePath, storagePath, frame))
 
         physical_path = os.path.join(absolutePath, storagePath, asset.file_location)
         local_db_session.query(ParentStageModel).filter(
@@ -424,8 +413,7 @@ class AssetService:
             multiframe_media.description = json.dumps(attributes)
             local_db_session.flush()
 
-        if os.path.exists(physical_path):
-            os.remove(physical_path)
+        self.file_handing.delete_file(physical_path)
 
     def resolve_sign(self, user: UserModel, asset: AssetModel):
         if asset.owner_id == user.id:
