@@ -605,7 +605,7 @@ type_defs = gql("""
         hello: String
         whoami: User
         adminPlayers(
-            first: Int,
+            limit: Int,
             page: Int,
             sort: [AdminPlayerSortEnum],
             usernameLike: String,

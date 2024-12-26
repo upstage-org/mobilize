@@ -215,8 +215,8 @@ class TestStudioController:
     async def test_03_admin_players(self, client):
         headers = test_AuthenticationController.get_headers(client, SUPER_ADMIN)
         query = """
-            query adminPlayers($first: Int,$page: Int,$sort: [AdminPlayerSortEnum],$usernameLike: String, $createdBetween: [String]) {
-                adminPlayers(first: $first, page: $page, sort: $sort, usernameLike: $usernameLike, createdBetween: $createdBetween) {
+            query adminPlayers($limit: Int,$page: Int,$sort: [AdminPlayerSortEnum],$usernameLike: String, $createdBetween: [String]) {
+                adminPlayers(limit: $limit, page: $page, sort: $sort, usernameLike: $usernameLike, createdBetween: $createdBetween) {
                     totalCount
                     edges {
                     email
@@ -227,7 +227,7 @@ class TestStudioController:
         """
 
         variables = {
-            "first": 10,
+            "limit": 10,
             "page": 1,
             "sort": [
                 "USERNAME_ASC",

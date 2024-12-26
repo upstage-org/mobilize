@@ -67,8 +67,8 @@ class StudioService:
                 elif sort_param == "CREATED_ON_DESC":
                     query = query.order_by(desc(UserModel.created_on))
 
-        if "first" in params:
-            limit = params["first"] or 10
+        if "limit" in params:
+            limit = params["limit"] or 10
             page = 0 if "page" not in params else (params["page"] - 1)
             offset = page * limit
             query = query.limit(limit).offset(offset)
