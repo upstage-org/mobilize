@@ -44,7 +44,7 @@ services:
   upstage:
     build:
       context: ../
-      dockerfile: ./mutilple-containers/Dockerfile
+      dockerfile: ./multiple-containers/Dockerfile
     ports:
       - "3000:3000"
     volumes:
@@ -57,7 +57,7 @@ services:
   upstage_event_archive:
     build:
       context: ../
-      dockerfile: ./mutilple-containers/Dockerfile.upstage_event_archive
+      dockerfile: ./multiple-containers/Dockerfile.upstage_event_archive
     container_name: upstage_event_archive_container
     ports:
       - "83:80"
@@ -70,7 +70,7 @@ services:
   upstage_email:
     build:
       context: ../
-      dockerfile: ./mutilple-containers/Dockerfile.upstage_email
+      dockerfile: ./multiple-containers/Dockerfile.upstage_email
     container_name: upstage_email_container
     ports:
       - "81:80"
@@ -83,7 +83,7 @@ services:
   upstage_stats:
     build:
       context: ../
-      dockerfile: ./mutilple-containers/Dockerfile.upstage_stats
+      dockerfile: ./multiple-containers/Dockerfile.upstage_stats
     container_name: upstage_stats_container
     ports:
       - "82:80"

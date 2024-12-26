@@ -93,7 +93,7 @@ else:
     HOSTNAME = socket.gethostname().replace(".", "_").replace("-", "_")
     print("Loading local settings from %s.py" % HOSTNAME)
 
-UPLOAD_USER_CONTENT_FOLDER = "/home/upstage/assets_all_releases"
+UPLOAD_USER_CONTENT_FOLDER = "/usr/app/uploads"
 
 UPSTAGE_FRONTEND_URL = os.getenv("UPSTAGE_FRONTEND_URL", "http://localhost:3000")
 ENV_TYPE = os.getenv("ENV_TYPE", "development")

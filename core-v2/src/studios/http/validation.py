@@ -11,17 +11,17 @@ class BatchUserInput(BaseModel):
 class UpdateUserInput(BaseModel):
     id: int
     username: str = Field(..., min_length=5, max_length=100)
-    password: Optional[str] = Field(..., min_length=8, max_length=256)
-    email: Optional[EmailStr]
-    binName: str = Field(..., min_length=1)
+    password: Optional[str] = Field(None, min_length=8, max_length=256)
+    email: EmailStr
+    binName:  Optional[str] = Field(None, min_length=1)
     role: int
-    firstName: str = Field(..., min_length=1)
-    lastName: str = Field(..., min_length=1)
-    displayName: str = Field(..., min_length=1)
+    firstName: Optional[str] = Field(None, min_length=1)
+    lastName:  Optional[str] = Field(None, min_length=1)
+    displayName:  Optional[str] = Field(None, min_length=1)
     active: bool
-    firebasePushnotId: str
+    firebasePushnotId:  Optional[str] = Field(None)
     uploadLimit: int
-    intro: str = Field(..., max_length=500)
+    intro:  Optional[str] = Field(None, max_length=500)
 
 
 class ChangePasswordInput(BaseModel):
