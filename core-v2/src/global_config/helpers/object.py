@@ -1,3 +1,4 @@
+import re
 from sqlalchemy.ext.declarative import DeclarativeMeta
 from datetime import datetime
 
@@ -18,3 +19,8 @@ def convert_keys_to_camel_case(data):
         return [convert_keys_to_camel_case(item) for item in data]
     else:
         return data
+
+
+def camel_to_snake(name: str) -> str:
+    s1 = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", name)
+    return re.sub("([a-z0-9])([A-Z])", r"\1_\2", s1).lower()

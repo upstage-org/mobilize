@@ -194,7 +194,9 @@ class MediaService:
                 .first()
             )
             if not frame_asset:
-                self.file_handling.delete_file( os.path.join(absolutePath, storagePath, frame))
+                self.file_handling.delete_file(
+                    os.path.join(absolutePath, storagePath, frame)
+                )
 
     def _get_physical_path(self, file_location):
         return os.path.join(absolutePath, storagePath, file_location)

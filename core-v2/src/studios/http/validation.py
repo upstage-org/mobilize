@@ -13,15 +13,15 @@ class UpdateUserInput(BaseModel):
     username: str = Field(..., min_length=5, max_length=100)
     password: Optional[str] = Field(None, min_length=8, max_length=256)
     email: Optional[EmailStr]
-    binName:  Optional[str] = Field(None, max_length=100)
+    binName: Optional[str] = Field(None, max_length=100)
     role: int
     firstName: Optional[str] = Field(None, max_length=100)
-    lastName:  Optional[str] = Field(None, max_length=100)
-    displayName:  Optional[str] = Field(None, max_length=100)
+    lastName: Optional[str] = Field(None, max_length=100)
+    displayName: Optional[str] = Field(None, max_length=100)
     active: bool
-    firebasePushnotId:  Optional[str] = Field(None)
+    firebasePushnotId: Optional[str] = Field(None)
     uploadLimit: int
-    intro:  Optional[str] = Field(None, max_length=500)
+    intro: Optional[str] = Field(None, max_length=500)
 
 
 class ChangePasswordInput(BaseModel):

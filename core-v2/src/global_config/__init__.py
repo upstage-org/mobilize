@@ -15,4 +15,5 @@ __all__ = [
     "config_graphql_endpoints",
     "DBSession",
     "global_session",
+    "camel_to_snake",
 ]

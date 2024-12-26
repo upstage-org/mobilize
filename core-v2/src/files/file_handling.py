@@ -16,7 +16,9 @@ class FileHandling:
     def validate_file_size(self, file_extension: str, file_size: int) -> bool:
         if file_extension.lower() in [".svg", ".jpg", ".jpeg", ".png", ".gif"]:
             if file_size > OTHER_MAX_SIZE:
-                raise GraphQLError(f"Image files must be under {self.convert_KB_to_MB(OTHER_MAX_SIZE)}MB.")
+                raise GraphQLError(
+                    f"Image files must be under {self.convert_KB_to_MB(OTHER_MAX_SIZE)}MB."
+                )
         elif file_extension.lower() in [
             ".wav",
             ".mpeg",
@@ -29,10 +31,14 @@ class FileHandling:
             ".m4a",
         ]:
             if file_size > OTHER_MAX_SIZE:
-                raise GraphQLError(f"Audio files must be under {self.convert_KB_to_MB(OTHER_MAX_SIZE)}MB.")
+                raise GraphQLError(
+                    f"Audio files must be under {self.convert_KB_to_MB(OTHER_MAX_SIZE)}MB."
+                )
         elif file_extension.lower() in [".mp4", ".webm", ".opgg", ".3gp", ".flv"]:
             if file_size > VIDEO_MAX_SIZE:
-                raise GraphQLError(f"Video files must be under {self.convert_KB_to_MB(VIDEO_MAX_SIZE)}MB.")
+                raise GraphQLError(
+                    f"Video files must be under {self.convert_KB_to_MB(VIDEO_MAX_SIZE)}MB."
+                )
         else:
             raise GraphQLError("Unsupported file format.")
 
@@ -44,7 +50,6 @@ class FileHandling:
         storage_path: str,
         sub_path: str,
     ) -> str:
-
         filename, file_extension = os.path.splitext(file_name)
         unique_filename = uuid.uuid4().hex + filename + file_extension
         media_directory = os.path.join(absolute_path, storage_path, sub_path)

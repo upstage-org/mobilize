@@ -109,8 +109,17 @@ class TestStudioController:
         query = """
             mutation updateUser($input: UpdateUserInput!) {
                 updateUser(input: $input) {
+                        id
                         username
+                        firstName
+                        lastName
+                        displayName
                         email
+                        active
+                        createdOn
+                        role
+                        uploadLimit
+                        intro
                 }
             }
         """
@@ -146,6 +155,13 @@ class TestStudioController:
         assert "data" in response.json()
         assert "updateUser" in response.json()["data"]
         assert "email" in response.json()["data"]["updateUser"]
+
+        user = DBSession.query(UserModel).filter(UserModel.username == username).first()
+
+        assert (
+            response.json()["data"]["updateUser"]["lastName"]
+            == variables["input"]["lastName"]
+        )
 
         variables = {
             "input": {

@@ -383,7 +383,9 @@ class AssetService:
                         .first()
                     )
                     if not frame_asset:
-                        self.file_handing.delete_file(os.path.join(absolutePath, storagePath, frame))
+                        self.file_handing.delete_file(
+                            os.path.join(absolutePath, storagePath, frame)
+                        )
 
         physical_path = os.path.join(absolutePath, storagePath, asset.file_location)
         local_db_session.query(ParentStageModel).filter(

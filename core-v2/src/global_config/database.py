@@ -14,16 +14,17 @@ projdir = os.path.abspath(os.path.join(app_dir, "../"))
 from .env import DATABASE_URL
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.pool import NullPool
 
-# logging.basicConfig()
-# logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
+logging.basicConfig()
+logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
 
 db = declarative_base()
 
 database = Database(DATABASE_URL)
 metadata = MetaData()
 
-engine = create_engine(DATABASE_URL)
+engine = create_engine(DATABASE_URL, poolclass=NullPool)
 metadata.create_all(engine)
 DBSession = scoped_session(sessionmaker(autocommit=False, autoflush=True, bind=engine))
 
@@ -57,7 +58,11 @@ class ScopedSession(object):
 
     def __init__(self, rollback_upon_failure=True):
         self.session = scoped_session(
-            sessionmaker(autocommit=False, autoflush=True, bind=engine)
+            sessionmaker(
+                autocommit=False,
+                autoflush=True,
+                bind=engine,
+            )
         )
         self.rollback_upon_failure = rollback_upon_failure
 
@@ -77,4 +82,6 @@ class ScopedSession(object):
                     f"Failed to commit db session, not rolled back, as per your request: {e}"
                 )
         finally:
+            print("Closing session")
             self.session.close()
+            self.session.remove

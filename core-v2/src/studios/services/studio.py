@@ -12,6 +12,7 @@ from global_config import (
     DBSession,
     ScopedSession,
     convert_keys_to_camel_case,
+    camel_to_snake,
     decrypt,
     encrypt,
 )
@@ -133,19 +134,21 @@ class StudioService:
             )
 
     async def update_user(self, input: UpdateUserInput):
-        with ScopedSession() as session:
-            try:
+        try:
+            with ScopedSession() as session:
                 self._validate_email(input)
                 user = self._get_user(session, input.id)
                 self._check_existing_email(input)
                 await self._update_user_fields(user, input)
+                session.add(user)
                 session.flush()
-                user = self._get_user(session, input.id)
-                return convert_keys_to_camel_case(user.to_dict())
-            except Exception as e:
-                raise GraphQLError(
-                    f"There was an error updating this user information: {str(e)}. Please check the logs and try again later!"
-                )
+                session.commit()
+            user = self._get_user(DBSession, input.id)
+            return convert_keys_to_camel_case(user.to_dict())
+        except Exception as e:
+            raise GraphQLError(
+                f"There was an error updating this user information: {str(e)}. Please check the logs and try again later!"
+            )
 
     def _validate_email(self, input: UpdateUserInput):
         if not input.email and input.role != GUEST:
@@ -166,17 +169,30 @@ class StudioService:
         if existing_email:
             raise GraphQLError("This email address already belongs to another user!")
 
-    async def _update_user_fields(self, user, input: UpdateUserInput):
+    async def _update_user_fields(self, user: UserModel, input: UpdateUserInput):
         if input.password:
             user.password = encrypt(input.password)
-        else:
-            del input.password
-
-        for key, value in input.model_dump().items():
-            if key == "active":
-                await self._handle_active_status(user, value)
-            if hasattr(user, key):
-                setattr(user, key, value)
+        if input.email:
+            user.email = input.email
+        if input.binName:
+            user.bin_name = input.binName
+        if input.role:
+            user.role = input.role
+        if input.firstName:
+            user.first_name = input.firstName
+        if input.lastName:
+            user.last_name = input.lastName
+        if input.displayName:
+            user.display_name = input.displayName
+        if input.active:
+            user.active = input.active
+            await self._handle_active_status(user, input.active)
+        if input.firebasePushnotId:
+            user.firebase_pushnot_id = input.firebasePushnotId
+        if input.uploadLimit:
+            user.upload_limit = input.uploadLimit
+        if input.intro:
+            user.intro = input.intro
 
     async def _handle_active_status(self, user: UserModel, value):
         if value and not user.active and not user.deactivated_on:
