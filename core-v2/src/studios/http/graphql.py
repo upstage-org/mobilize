@@ -323,6 +323,7 @@ type_defs = gql("""
         owner: User
         assets: [Asset]        
         createdOn: Date
+        lastAccess: Date
     }
                 
         type PerformanceCommunication {
