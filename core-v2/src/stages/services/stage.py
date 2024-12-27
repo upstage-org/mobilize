@@ -29,6 +29,7 @@ class StageService:
             .outerjoin(UserModel)
             .outerjoin(ParentStageModel)
             .outerjoin(AssetModel)
+            .distinct(StageModel.id)
         )
 
         if input.name:
@@ -62,9 +63,7 @@ class StageService:
         limit = input.limit if input.limit else 10
         page = input.page if input.page else 1
 
-        query = query.limit(limit).offset((page - 1) * limit)
-
-        stages = query.all()
+        stages = query.limit(limit).offset((page - 1) * limit).all()
 
         return {
             "edges": [
@@ -88,6 +87,9 @@ class StageService:
             .outerjoin(UserModel)
             .outerjoin(ParentStageModel)
             .outerjoin(AssetModel)
+            .outerjoin(PerformanceModel)
+            .outerjoin(SceneModel, SceneModel.stage_id == StageModel.id)
+            .outerjoin(EventModel, EventModel.performance_id == PerformanceModel.id)
             .filter(StageModel.id == id)
             .first()
         )
@@ -415,6 +417,8 @@ class StageService:
         player_access = stage.attributes.filter(
             StageAttributeModel.name == "playerAccess"
         ).first()
+
+        print("abaaa", player_access.to_dict())
 
         if player_access:
             accesses = json.loads(player_access.description)

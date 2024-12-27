@@ -5,13 +5,13 @@ from pydantic import BaseModel, Field, conint
 
 class StageInput(BaseModel):
     id: Optional[int] = Field(None, description="ID of the stage")
-    fileLocation: str = Field(..., description="Location of the file")
+    fileLocation: Optional[str] = Field(None, description="Location of the file")
     status: str = Field(..., description="Status of the stage")
-    visibility: bool = Field(..., description="Visibility of the stage")
-    cover: str = Field(..., description="Cover image URL")
+    visibility: Optional[bool] = Field(None, description="Visibility of the stage")
+    cover: Optional[str] = Field(None, description="Cover image URL")
     name: str = Field(..., description="Name of the stage")
-    description: str = Field(..., description="Description of the stage")
-    playerAccess: str = Field(..., description="Player access information")
+    description: Optional[str] = Field(None, description="Description of the stage")
+    playerAccess: Optional[str] = Field(None, description="Player access information")
     config: Optional[str] = Field(None, description="Configuration of the stage")
 
 

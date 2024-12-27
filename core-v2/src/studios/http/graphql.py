@@ -286,6 +286,7 @@ type_defs = gql("""
         copyrightLevel: Int
         permissions: [Permission]
         privilege: String
+        fileLocation: String
     }     
 
     type AssetConnection {
@@ -309,8 +310,8 @@ type_defs = gql("""
         id: ID
         name: String!
     }
-
-    type Stage {
+      
+     type Stage {
         id: ID!
         name: String
         fileLocation: String
@@ -321,12 +322,25 @@ type_defs = gql("""
         playerAccess: String    
         permission: String
         owner: User
-        assets: [Asset]        
-        createdOn: Date
+        assets: [Asset]    
+        chats: [Event]  
+        performances: [Performance]  
+        scenes: [Scene]
         lastAccess: Date
+        createdOn: Date
     }
                 
-        type PerformanceCommunication {
+    type Event {
+        id: ID!
+        topic: String
+        mqttTimestamp: Float
+        performanceId: ID
+        payload: JSONString
+        created: Date
+    }
+
+                
+    type PerformanceCommunication {
         id: ID!
         ownerId: ID!
         ipAddress: String!
@@ -508,6 +522,7 @@ type_defs = gql("""
     }
 
     scalar Date
+    scalar JSONString
 
     enum AssetSortEnum {
         ASSET_TYPE_ID_ASC
