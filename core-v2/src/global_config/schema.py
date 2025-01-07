@@ -152,6 +152,8 @@ def config_graphql_endpoints(app: FastAPI):
     combined_query.set_field("mediaList", asset_query._resolvers["mediaList"])
     combined_query.set_field("tags", asset_query._resolvers["tags"])
     combined_query.set_field("mediaTypes", asset_query._resolvers["mediaTypes"])
+    combined_query.set_field("voices", asset_query._resolvers["voices"])
+
     combined_mutation.set_field(
         "batchUserCreation", studio_mutation._resolvers["batchUserCreation"]
     )

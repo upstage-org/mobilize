@@ -38,3 +38,16 @@ class AssetModel(BaseModel):
     permissions = relationship(
         "AssetUsageModel", lazy="dynamic", back_populates="asset"
     )
+
+
+class AvatarVoice:
+    voice: String
+    variant: String
+    pitch: Integer
+    speed: Integer
+    amplitude: Integer
+
+
+class Voice:
+    voice: AvatarVoice
+    avatar: AssetModel

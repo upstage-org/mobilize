@@ -651,5 +651,20 @@ type_defs = gql("""
         nginx: NginxConfig!
         system: SystemConfig!
         foyer: FoyerConfig!
-    }      
+                
+        voices: [Voice!]
+    }    
+
+    type Voice {
+        avatar: Asset
+        voice: AvatarVoice
+    }  
+                
+    type AvatarVoice {
+        voice: String
+        variant: String!
+        pitch: Int!
+        speed: Int!
+        amplitude: Int!
+    }
 """)

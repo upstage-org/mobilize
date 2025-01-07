@@ -358,7 +358,17 @@ class StageService:
                     stage_id=id, name="status", description="live"
                 )
             local_db_session.add(attribute)
-            return {"result": attribute.description}
+            local_db_session.commit()
+
+        attribute = (
+            local_db_session.query(StageAttributeModel)
+            .filter(
+                StageAttributeModel.stage_id == id,
+                StageAttributeModel.name == "status",
+            )
+            .first()
+        )
+        return {"result": attribute.description}
 
     def update_visibility(self, user: UserModel, id: int):
         with ScopedSession() as local_db_session:
@@ -381,13 +391,24 @@ class StageService:
             )
 
             if attribute is not None:
-                attribute.description = True if not attribute.description else ""
+                attribute.description = True if attribute.description == "" else ""
             else:
                 attribute = StageAttributeModel(
                     stage_id=id, name="visibility", description=True
                 )
+
             local_db_session.add(attribute)
-            return {"result": attribute.description}
+
+        attribute = (
+            DBSession.query(StageAttributeModel)
+            .filter(
+                StageAttributeModel.stage_id == id,
+                StageAttributeModel.name == "visibility",
+            )
+            .first()
+        )
+
+        return {"result": attribute.description}
 
     def update_last_access(self, user: UserModel, id: int):
         with ScopedSession() as local_db_session:
@@ -401,6 +422,7 @@ class StageService:
                 raise GraphQLError("You are not authorized to update this stage")
 
             stage.last_access = datetime.now()
+            local_db_session.commit()
             return {"result": stage.last_access}
 
     def get_parent_stage(self):
@@ -417,8 +439,6 @@ class StageService:
         player_access = stage.attributes.filter(
             StageAttributeModel.name == "playerAccess"
         ).first()
-
-        print("abaaa", player_access.to_dict())
 
         if player_access:
             accesses = json.loads(player_access.description)

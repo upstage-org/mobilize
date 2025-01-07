@@ -36,6 +36,12 @@ async def get_tags(_, __):
     return AssetService().get_tags()
 
 
+@query.field("voices")
+@authenticated(allowed_roles=[SUPER_ADMIN, ADMIN, PLAYER])
+async def get_voices(_, __):
+    return AssetService().get_voices()
+
+
 @mutation.field("uploadFile")
 @authenticated(allowed_roles=[SUPER_ADMIN, ADMIN, PLAYER])
 async def upload_file(_, __, base64: str, filename: str):

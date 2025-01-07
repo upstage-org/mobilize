@@ -17,7 +17,7 @@ from global_config import (
     STREAM_KEY,
     convert_keys_to_camel_case,
 )
-from assets.db_models.asset import AssetModel
+from assets.db_models.asset import AssetModel, AvatarVoice, Voice
 from assets.db_models.asset_license import AssetLicenseModel
 from assets.db_models.asset_type import AssetTypeModel
 from assets.db_models.asset_usage import AssetUsageModel
@@ -476,3 +476,29 @@ class AssetService:
             convert_keys_to_camel_case(tag.to_dict())
             for tag in DBSession.query(TagModel).all()
         ]
+
+    def get_voices(self):
+        voices = []
+        for media in (
+            DBSession.query(AssetModel)
+            .filter(AssetModel.asset_type.has(AssetTypeModel.name == "avatar"))
+            .all()
+        ):
+            if media.description:
+                attributes = json.loads(media.description)
+                if "voice" in attributes:
+                    voice = attributes["voice"]
+                    if voice and voice["voice"]:
+                        av = AvatarVoice()
+                        av.voice = voice["voice"]
+                        av.variant = voice["variant"]
+                        for key in ["pitch", "speed", "amplitude"]:
+                            if key in voice:
+                                setattr(av, key, int(voice[key]))
+                            else:
+                                if key == "speed":
+                                    setattr(av, key, 175)
+                                else:
+                                    setattr(av, key, 50)
+                        voices.append(Voice(avatar=media, voice=av))
+        return [convert_keys_to_camel_case(voice) for voice in voices]

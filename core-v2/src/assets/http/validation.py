@@ -23,7 +23,7 @@ class SaveMediaInput(BaseModel):
     name: constr(min_length=1)
     mediaType: constr(min_length=1)
     copyrightLevel: conint(ge=0)
-    owner: constr(min_length=1)
+    owner: Optional[str] = None
     stageIds: conlist(int)
     userIds: Optional[List[int]] = []
     tags: Optional[List[str]] = []
