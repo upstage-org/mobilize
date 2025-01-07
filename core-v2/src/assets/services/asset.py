@@ -24,6 +24,7 @@ from assets.db_models.asset_usage import AssetUsageModel
 from assets.db_models.media_tag import MediaTagModel
 from assets.db_models.tag import TagModel
 from assets.http.validation import MediaTableInput, SaveMediaInput
+from stages.db_models.stage import StageModel
 from stages.db_models.parent_stage import ParentStageModel
 from users.db_models.user import ADMIN, SUPER_ADMIN, UserModel
 from files.file_handling import FileHandling
@@ -65,6 +66,11 @@ class AssetService:
             .join(UserModel)
             .join(AssetTypeModel)
             .outerjoin(AssetLicenseModel)
+            .outerjoin(
+                ParentStageModel, AssetModel.id == ParentStageModel.child_asset_id
+            )
+            .outerjoin(StageModel, ParentStageModel.stage_id == AssetModel.id)
+            .distinct(AssetModel.id)
         )
         if search_assets.name:
             query = query.filter(AssetModel.name.like(f"%{search_assets.name}%"))
@@ -113,12 +119,19 @@ class AssetService:
             query = query.limit(search_assets.limit).offset(
                 (search_assets.page - 1) * search_assets.limit
             )
-        
         assets = query.all()
 
         return {
             "totalCount": total_count,
-            "edges": [convert_keys_to_camel_case(asset.to_dict()) for asset in assets],
+            "edges": [
+                {
+                    **convert_keys_to_camel_case(asset.to_dict()),
+                    "stages": [
+                        convert_keys_to_camel_case(item.stage) for item in asset.stages
+                    ],
+                }
+                for asset in assets
+            ],
         }
 
     def upload_file(self, base64: str, filename: str):
