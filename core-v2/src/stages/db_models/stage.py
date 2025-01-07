@@ -4,7 +4,6 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.ext.hybrid import hybrid_property
 from global_config import BaseModel
 from stages.db_models.stage_attribute import StageAttributeModel
-from users.db_models.user import UserModel
 
 
 class StageModel(BaseModel):
@@ -27,26 +26,27 @@ class StageModel(BaseModel):
     )
     assets = relationship("ParentStageModel", lazy="dynamic", back_populates="stage")
 
-    # @hybrid_property
-    # def cover(self):
-    #     return (
-    #         self.attributes.filter(StageAttributeModel.name == "cover")
-    #         .first()
-    #         .description
-    #     )
+    @hybrid_property
+    def cover(self):
+        return (
+            self.attributes.filter(StageAttributeModel.name == "cover")
+            .first()
+            .description
+        )
 
-    # @hybrid_property
-    # def visibility(self):
-    #     return (
-    #         self.attributes.filter(StageAttributeModel.name == "visibility")
-    #         .first()
-    #         .description
-    #     )
+    @hybrid_property
+    def visibility(self):
+        return (
+            self.attributes.filter(StageAttributeModel.name == "visibility")
+            .first()
+            .description
+            == "true"
+        )
 
-    # @hybrid_property
-    # def status(self):
-    #     return (
-    #         self.attributes.filter(StageAttributeModel.name == "status")
-    #         .first()
-    #         .description
-    #     )
+    @hybrid_property
+    def status(self):
+        return (
+            self.attributes.filter(StageAttributeModel.name == "status")
+            .first()
+            .description
+        )

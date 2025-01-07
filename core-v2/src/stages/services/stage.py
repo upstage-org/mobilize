@@ -70,6 +70,9 @@ class StageService:
                 convert_keys_to_camel_case(
                     {
                         **stage.to_dict(),
+                        "cover": stage.cover,
+                        "visibility": stage.visibility,
+                        "status": stage.status,
                         "assets": [
                             asset.child_asset.to_dict() for asset in stage.assets
                         ],

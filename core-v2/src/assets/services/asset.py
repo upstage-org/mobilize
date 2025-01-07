@@ -60,17 +60,18 @@ class AssetService:
     def search_assets(self, search_assets: MediaTableInput):
         total_count = DBSession.query(AssetModel).count()
 
-        query = DBSession.query(AssetModel).outerjoin(AssetLicenseModel)
+        query = (
+            DBSession.query(AssetModel)
+            .join(UserModel)
+            .join(AssetTypeModel)
+            .outerjoin(AssetLicenseModel)
+        )
         if search_assets.name:
             query = query.filter(AssetModel.name.like(f"%{search_assets.name}%"))
         if search_assets.mediaTypes:
-            query = query.join(AssetTypeModel).filter(
-                AssetTypeModel.name.in_(search_assets.mediaTypes)
-            )
+            query = query.filter(AssetTypeModel.name.in_(search_assets.mediaTypes))
         if search_assets.owners:
-            query = query.join(UserModel).filter(
-                UserModel.username.in_(search_assets.owners)
-            )
+            query = query.filter(UserModel.username.in_(search_assets.owners))
 
         if search_assets.stages:
             query = query.filter(
@@ -112,9 +113,13 @@ class AssetService:
             query = query.limit(search_assets.limit).offset(
                 (search_assets.page - 1) * search_assets.limit
             )
-
+        
         assets = query.all()
-        return convert_keys_to_camel_case({"totalCount": total_count, "edges": assets})
+
+        return {
+            "totalCount": total_count,
+            "edges": [convert_keys_to_camel_case(asset.to_dict()) for asset in assets],
+        }
 
     def upload_file(self, base64: str, filename: str):
         file_location = self.file_handing.upload_file(
