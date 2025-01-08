@@ -36,7 +36,7 @@ from graphql import GraphQLError
 
 appdir = os.path.abspath(os.path.dirname(__file__))
 absolutePath = os.path.dirname(appdir)
-storagePath = "../../uploads/assets"
+storagePath = "../../uploads"
 
 
 class StudioService:

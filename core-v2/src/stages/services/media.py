@@ -29,7 +29,7 @@ from users.db_models.user import UserModel
 
 appdir = os.path.abspath(os.path.dirname(__file__))
 absolutePath = os.path.dirname(os.path.abspath(os.path.join(appdir, "..", "..")))
-storagePath = "uploads/assets"
+storagePath = "uploads"
 
 
 class MediaService:

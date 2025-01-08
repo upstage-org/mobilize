@@ -32,7 +32,7 @@ from files.file_handling import FileHandling
 
 appdir = os.path.abspath(os.path.dirname(__file__))
 absolutePath = os.path.dirname(appdir)
-storagePath = "../../uploads/assets"
+storagePath = "../../uploads"
 
 
 class AssetService:
