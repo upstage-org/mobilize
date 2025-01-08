@@ -6,7 +6,12 @@ from sqlalchemy import and_
 from global_config import DBSession, ScopedSession, convert_keys_to_camel_case
 
 from users.db_models.user import ADMIN, SUPER_ADMIN
-from stages.http.validation import DuplicateStageInput, SearchStageInput, StageInput
+from stages.http.validation import (
+    DuplicateStageInput,
+    SearchStageInput,
+    StageInput,
+    StageStreamInput,
+)
 
 from event_archive.db_models.event import EventModel
 from performance_config.db_models.performance import PerformanceModel
@@ -83,6 +88,39 @@ class StageService:
             ],
             "totalCount": count,
         }
+
+    def get_stage_list(self, input: StageStreamInput):
+        query = (
+            DBSession.query(StageModel)
+            .outerjoin(UserModel)
+            .outerjoin(StageAttributeModel)
+            .outerjoin(ParentStageModel)
+            .outerjoin(AssetModel)
+            .outerjoin(PerformanceModel)
+            .outerjoin(SceneModel, SceneModel.stage_id == StageModel.id)
+            .outerjoin(EventModel, EventModel.performance_id == PerformanceModel.id)
+            .distinct(StageModel.id)
+        )
+
+        if input.fileLocation:
+            query = query.filter(StageModel.file_location == input.fileLocation)
+
+        if input.performanceId:
+            query = query.filter(PerformanceModel.id == input.performanceId).filter(
+                EventModel.id == input.performanceId
+            )
+
+        stages = query.all()
+
+        return [
+            convert_keys_to_camel_case(
+                {
+                    **stage.to_dict(),
+                    "assets": [asset.child_asset.to_dict() for asset in stage.assets],
+                }
+            )
+            for stage in stages
+        ]
 
     def get_stage_by_id(self, user: UserModel, id: int):
         stage = (

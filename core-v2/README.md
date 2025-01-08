@@ -2242,3 +2242,93 @@ Example Response:
   }
 }
 ```
+
+**stageList**
+
+Example Query:
+```graphql
+query {
+    stageList(input: { fileLocation: "duplicate-stage17" }) {
+        id
+        name
+        fileLocation
+        owner {
+            id
+            binName
+            username
+        }
+        attributes {
+            id
+            name
+            description
+        }
+        assets {
+            assetType {
+                name
+            }
+            name
+            id
+            fileLocation
+            description
+        }
+        scenes {
+            id
+            name
+        }
+        performances {
+            id
+            name
+        }
+    }
+}
+```
+
+Example Response:
+```json
+{
+    "data": {
+        "stageList": [
+            {
+                "id": "1",
+                "name": "Stage One",
+                "fileLocation": "duplicate-stage17",
+                "owner": {
+                    "id": "1",
+                    "binName": "Owner Bin",
+                    "username": "owner1"
+                },
+                "attributes": [
+                    {
+                        "id": "1",
+                        "name": "Attribute One",
+                        "description": "Description of Attribute One"
+                    }
+                ],
+                "assets": [
+                    {
+                        "assetType": {
+                            "name": "Image"
+                        },
+                        "name": "Asset One",
+                        "id": "1",
+                        "fileLocation": "/path/to/asset1",
+                        "description": "Description of Asset One"
+                    }
+                ],
+                "scenes": [
+                    {
+                        "id": "1",
+                        "name": "Scene One"
+                    }
+                ],
+                "performances": [
+                    {
+                        "id": "1",
+                        "name": "Performance One"
+                    }
+                ]
+            }
+        ]
+    }
+}
+```

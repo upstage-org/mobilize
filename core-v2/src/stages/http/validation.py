@@ -95,3 +95,8 @@ class SearchStageInput(BaseModel):
     createdBetween: Optional[List[date]] = Field(
         None, description="List of two dates representing the created date range"
     )
+
+
+class StageStreamInput(BaseModel):
+    fileLocation: Optional[str] = Field(None, description="Location of the file")
+    performanceId: Optional[int] = Field(None, description="ID of the performance")

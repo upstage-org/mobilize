@@ -218,6 +218,11 @@ type_defs = gql("""
         stageIds: [ID!]
     }
                 
+    input StageStreamInput {
+        fileLocation: String
+        performanceId: ID
+    }
+                
    type StagesResponse {
         totalCount: Int
         edges: [Stage]
@@ -328,7 +333,9 @@ type_defs = gql("""
         scenes: [Scene]
         lastAccess: Date
         createdOn: Date
+        attributes:[StageAttribute]
     }
+                
                 
     type Event {
         id: ID!
@@ -646,6 +653,7 @@ type_defs = gql("""
         stages(input: SearchStageInput): StagesResponse
         stage(id: ID!): Stage
         foyerStageList: [Stage!]!
+        stageList(input: StageStreamInput): [Stage!]!
                 
 
         nginx: NginxConfig!
@@ -666,5 +674,11 @@ type_defs = gql("""
         pitch: Int!
         speed: Int!
         amplitude: Int!
+    }
+                
+    type StageAttribute {
+        id: ID
+        name: String
+        description: String
     }
 """)

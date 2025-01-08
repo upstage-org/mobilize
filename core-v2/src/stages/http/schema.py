@@ -14,6 +14,7 @@ from stages.http.validation import (
     SceneInput,
     SearchStageInput,
     StageInput,
+    StageStreamInput,
     UpdateMediaInput,
     UploadMediaInput,
 )
@@ -32,6 +33,12 @@ def search_stages(_, info, input):
         UserModel(**info.context["request"].state.current_user),
         SearchStageInput(**input),
     )
+
+
+@query.field("stageList")
+@authenticated(allowed_roles=[SUPER_ADMIN, ADMIN, PLAYER])
+def stage_list(_, info, input: StageStreamInput):
+    return StageService().get_stage_list(StageStreamInput(**input))
 
 
 @query.field("foyerStageList")

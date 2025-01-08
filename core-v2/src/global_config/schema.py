@@ -76,6 +76,7 @@ def config_graphql_endpoints(app: FastAPI):
     combined_query.set_field("stages", stage_query._resolvers["stages"])
     combined_query.set_field("foyerStageList", stage_query._resolvers["foyerStageList"])
     combined_query.set_field("stage", stage_query._resolvers["stage"])
+    combined_query.set_field("stageList", stage_query._resolvers["stageList"])
 
     combined_mutation.set_field("createStage", stage_mutation._resolvers["createStage"])
     combined_mutation.set_field("updateStage", stage_mutation._resolvers["updateStage"])
