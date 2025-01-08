@@ -2247,88 +2247,109 @@ Example Response:
 
 Example Query:
 ```graphql
-query {
-    stageList(input: { fileLocation: "duplicate-stage17" }) {
-        id
-        name
-        fileLocation
-        owner {
-            id
-            binName
-            username
-        }
-        attributes {
-            id
-            name
-            description
-        }
-        assets {
-            assetType {
-                name
-            }
-            name
-            id
-            fileLocation
-            description
-        }
-        scenes {
-            id
-            name
-        }
-        performances {
-            id
-            name
-        }
+{
+  stageList(
+    input:{ fileLocation:"duplicate-stage17"}
+  ) {
+    id
+    name
+    fileLocation
+    owner {
+      id
+      binName
+      username
     }
+     attributes {
+      id
+      name
+      description
+    }
+    visibility
+    status
+    permission
+    
+  	assets {
+      assetType {
+        name
+      }
+      name
+      id
+      fileLocation
+      description
+    }
+    scenes {
+      id
+      name
+    }
+  	events {
+      id
+      payload
+      scenePreview
+      mqttTimestamp
+    }
+  }
 }
 ```
 
 Example Response:
 ```json
 {
-    "data": {
-        "stageList": [
-            {
-                "id": "1",
-                "name": "Stage One",
-                "fileLocation": "duplicate-stage17",
-                "owner": {
-                    "id": "1",
-                    "binName": "Owner Bin",
-                    "username": "owner1"
-                },
-                "attributes": [
-                    {
-                        "id": "1",
-                        "name": "Attribute One",
-                        "description": "Description of Attribute One"
-                    }
-                ],
-                "assets": [
-                    {
-                        "assetType": {
-                            "name": "Image"
-                        },
-                        "name": "Asset One",
-                        "id": "1",
-                        "fileLocation": "/path/to/asset1",
-                        "description": "Description of Asset One"
-                    }
-                ],
-                "scenes": [
-                    {
-                        "id": "1",
-                        "name": "Scene One"
-                    }
-                ],
-                "performances": [
-                    {
-                        "id": "1",
-                        "name": "Performance One"
-                    }
-                ]
-            }
-        ]
-    }
+  "data": {
+    "stageList": [
+      {
+        "id": "69",
+        "name": "Duplicate Stage",
+        "fileLocation": "duplicate-stage17",
+        "owner": {
+          "id": "485",
+          "binName": "",
+          "username": "422lisa63@example.org"
+        },
+        "attributes": [
+          {
+            "id": "352",
+            "name": "status",
+            "description": "live"
+          },
+          {
+            "id": "347",
+            "name": "cover",
+            "description": "http://example.com/cover.jpg"
+          },
+          {
+            "id": "350",
+            "name": "playerAccess",
+            "description": "public"
+          },
+          {
+            "id": "351",
+            "name": "description",
+            "description": "Description of the stage"
+          },
+          {
+            "id": "348",
+            "name": "visibility",
+            "description": ""
+          }
+        ],
+        "visibility": false,
+        "status": "live",
+        "permission": null,
+        "assets": [
+          {
+            "assetType": {
+              "name": "image"
+            },
+            "name": "test",
+            "id": "31",
+            "fileLocation": "image/a8423b526ce9418297249603e0788d47test.png",
+            "description": null
+          }
+        ],
+        "scenes": [],
+        "events": []
+      }
+    ]
+  }
 }
 ```

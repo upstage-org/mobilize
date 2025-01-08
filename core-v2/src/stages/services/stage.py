@@ -96,19 +96,12 @@ class StageService:
             .outerjoin(StageAttributeModel)
             .outerjoin(ParentStageModel)
             .outerjoin(AssetModel)
-            .outerjoin(PerformanceModel)
-            .outerjoin(SceneModel, SceneModel.stage_id == StageModel.id)
-            .outerjoin(EventModel, EventModel.performance_id == PerformanceModel.id)
             .distinct(StageModel.id)
         )
 
         if input.fileLocation:
             query = query.filter(StageModel.file_location == input.fileLocation)
 
-        if input.performanceId:
-            query = query.filter(PerformanceModel.id == input.performanceId).filter(
-                EventModel.id == input.performanceId
-            )
 
         stages = query.all()
 
@@ -117,10 +110,36 @@ class StageService:
                 {
                     **stage.to_dict(),
                     "assets": [asset.child_asset.to_dict() for asset in stage.assets],
+                    "scenes": self.get_scene_list(input, stage.id),
+                    "events": self.get_event_list(input, stage),
+                    "cover": stage.cover,
+                    "visibility": stage.visibility,
+                    "status": stage.status,
                 }
             )
             for stage in stages
         ]
+    
+    def get_event_list(self, input: StageStreamInput, stage: StageModel):
+        events = (
+            DBSession.query(EventModel)
+            .filter(EventModel.performance_id == input.performanceId)
+            .filter(EventModel.topic.like("%/{}/%".format(stage.file_location)))
+            .order_by(EventModel.mqtt_timestamp.asc())
+            .all()
+        )
+        return [convert_keys_to_camel_case(event.to_dict()) for event in events]
+
+    def get_scene_list(self, input: StageStreamInput, stage_id: int):
+        query = (
+        DBSession.query(SceneModel)
+        .filter(SceneModel.stage_id == stage_id)
+        .order_by(SceneModel.scene_order.asc())
+        )
+        if not input.performanceId:  # Only fetch disabled scene in performance replay
+            query = query.filter(SceneModel.active == True)
+        scenes = query.all()
+        return [convert_keys_to_camel_case(scene.to_dict()) for scene in scenes]
 
     def get_stage_by_id(self, user: UserModel, id: int):
         stage = (

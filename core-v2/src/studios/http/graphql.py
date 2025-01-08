@@ -329,7 +329,7 @@ type_defs = gql("""
         owner: User
         assets: [Asset]    
         chats: [Event]  
-        performances: [Performance]  
+        events: [Event]  
         scenes: [Scene]
         lastAccess: Date
         createdOn: Date
@@ -342,6 +342,7 @@ type_defs = gql("""
         topic: String
         mqttTimestamp: Float
         performanceId: ID
+        scenePreview: String
         payload: JSONString
         created: Date
     }
