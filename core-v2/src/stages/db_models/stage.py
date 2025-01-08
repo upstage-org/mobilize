@@ -36,13 +36,13 @@ class StageModel(BaseModel):
 
     @hybrid_property
     def visibility(self):
-        attribute = (
-            self.attributes.filter(StageAttributeModel.name == "visibility").first()
-        )
+        attribute = self.attributes.filter(
+            StageAttributeModel.name == "visibility"
+        ).first()
 
         if attribute:
             return attribute.description == "true"
-        
+
         return False
 
     @hybrid_property

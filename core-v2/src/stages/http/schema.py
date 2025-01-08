@@ -36,9 +36,8 @@ def search_stages(_, info, input):
 
 
 @query.field("stageList")
-@authenticated(allowed_roles=[SUPER_ADMIN, ADMIN, PLAYER])
 def stage_list(_, info, input: StageStreamInput):
-    return StageService().get_stage_list(StageStreamInput(**input))
+    return StageService().get_stage_list(info, StageStreamInput(**input))
 
 
 @query.field("foyerStageList")

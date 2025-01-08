@@ -2,8 +2,16 @@ import json
 import re
 from datetime import datetime
 from graphql import GraphQLError
+import jwt
+from requests import Request
 from sqlalchemy import and_
-from global_config import DBSession, ScopedSession, convert_keys_to_camel_case
+from global_config import (
+    DBSession,
+    ScopedSession,
+    convert_keys_to_camel_case,
+    ALGORITHM,
+    SECRET_KEY,
+)
 
 from users.db_models.user import ADMIN, SUPER_ADMIN
 from stages.http.validation import (
@@ -89,7 +97,19 @@ class StageService:
             "totalCount": count,
         }
 
-    def get_stage_list(self, input: StageStreamInput):
+    def get_stage_list(self, info, input: StageStreamInput):
+        request: Request = info.context["request"]
+        authorization: str = request.headers.get("Authorization")
+        current_user_id = None
+        token = authorization.split(" ")[1] if authorization else None
+
+        print("token", token)
+
+        if token:
+            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+            print("payload", payload)
+            current_user_id = payload.get("user_id")
+
         query = (
             DBSession.query(StageModel)
             .outerjoin(UserModel)
@@ -101,7 +121,6 @@ class StageService:
 
         if input.fileLocation:
             query = query.filter(StageModel.file_location == input.fileLocation)
-
 
         stages = query.all()
 
@@ -115,11 +134,12 @@ class StageService:
                     "cover": stage.cover,
                     "visibility": stage.visibility,
                     "status": stage.status,
+                    "permission": self.resolve_permission(current_user_id, stage),
                 }
             )
             for stage in stages
         ]
-    
+
     def get_event_list(self, input: StageStreamInput, stage: StageModel):
         events = (
             DBSession.query(EventModel)
@@ -132,9 +152,9 @@ class StageService:
 
     def get_scene_list(self, input: StageStreamInput, stage_id: int):
         query = (
-        DBSession.query(SceneModel)
-        .filter(SceneModel.stage_id == stage_id)
-        .order_by(SceneModel.scene_order.asc())
+            DBSession.query(SceneModel)
+            .filter(SceneModel.stage_id == stage_id)
+            .order_by(SceneModel.scene_order.asc())
         )
         if not input.performanceId:  # Only fetch disabled scene in performance replay
             query = query.filter(SceneModel.active == True)
