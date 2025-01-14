@@ -8,16 +8,15 @@ import useForm from "ant-design-vue/lib/form/useForm";
 import { reactive } from "vue";
 import { toRaw } from "vue";
 import { KeyOutlined } from "@ant-design/icons-vue";
-import { User } from "genql/studio";
 
 export default {
   props: {
     player: {
-      type: Object as PropType<User>,
+      type: Object,
       required: true,
     },
     onSave: {
-      type: Function as PropType<(player: User) => Promise<void>>,
+      type: Function as PropType<(player: any) => Promise<void>>,
     },
     saving: {
       type: Object as PropType<{ value: boolean }>,

@@ -1,5 +1,4 @@
 export interface SharedConfigs {
-  API_ENDPOINT: string;
   GRAPHQL_ENDPOINT: string;
   STATIC_ASSETS_ENDPOINT: string;
   STUDIO_ENDPOINT: string;

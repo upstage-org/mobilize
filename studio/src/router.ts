@@ -68,6 +68,7 @@ export const router = createRouter({
               name: "New Stage",
               children: [
                 {
+                  name: "General Stage",
                   path: "", component: () =>
                     import("views/stages/StageManagement/General.vue")
                 }

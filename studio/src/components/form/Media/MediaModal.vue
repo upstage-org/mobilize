@@ -148,7 +148,7 @@ export default {
       };
     }
     if (form.assetType) {
-      form.mediaType = form.assetType.name;
+      form.assetType = form.assetType.name;
     }
     if (form.isRTMP && form.src.includes("?")) {
       form.src = form.src.split("?")[0];

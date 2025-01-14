@@ -10,6 +10,7 @@ import {
 import { computed } from "vue";
 import { useMutation } from "@vue/apollo-composable";
 import gql from "graphql-tag";
+import { inquiryVar } from "apollo";
 
 export default {
   props: {
@@ -49,10 +50,10 @@ export default {
     });
 
     const { mutate, loading, onDone, onError } = useMutation(gql`
-      mutation BatchUserCreation($users: [BatchUserInput]!, $stageIds: [Int]) {
-        batchUserCreation(users: $users, stageIds: $stageIds) {
+      mutation BatchUserCreation($users: [BatchUserInput]!) {
+        batchUserCreation(users: $users) {
           users {
-            dbId
+            id
           }
         }
       }
@@ -66,7 +67,17 @@ export default {
         email: "",
         password: "",
       });
+
+      inquiryVar({
+        ...inquiryVar(),
+        refresh: new Date(),
+      });
     });
+
+    const watchInquiryVar = (vars: any) => {
+      inquiryVar.onNextChange(watchInquiryVar);
+    };
+    inquiryVar.onNextChange(watchInquiryVar);
 
     onError((e) => {
       message.error(e.message);

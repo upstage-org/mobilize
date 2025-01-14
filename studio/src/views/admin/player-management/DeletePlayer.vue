@@ -6,16 +6,15 @@ import { DeleteOutlined } from "@ant-design/icons-vue";
 import { PropType } from "vue";
 import gql from "graphql-tag";
 import { useMutation } from "@vue/apollo-composable";
-import { User } from "genql/studio";
 
 export default {
   props: {
     player: {
-      type: Object as PropType<User>,
+      type: Object,
       required: true,
     },
     onDone: {
-      type: Function as PropType<(player: User) => Promise<void>>,
+      type: Function as PropType<(player: any) => Promise<void>>,
       required: true,
     },
   },
@@ -29,8 +28,9 @@ export default {
       { id: string }
     >(gql`
       mutation DeleteUser($id: ID!) {
-        deleteUser(inbound: { id: $id }) {
+        deleteUser(id: $id) {
           success
+          message
         }
       }
     `);

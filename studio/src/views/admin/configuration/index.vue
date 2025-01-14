@@ -3,52 +3,39 @@ import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute } from "vue-router";
 import Entry from "./entry.vue";
-import { h } from "vue";
+import { h, computed } from "vue";
 import { useAsyncState } from "@vueuse/core";
-import { configClient } from "services/graphql";
 import { Skeleton, Space } from "ant-design-vue";
-import { settings } from "state/settings";
 import Header from "components/Header.vue";
-
+import { useStore } from "vuex";
+const store = useStore();
 const route = useRoute();
 const activeKey = ref((route.params.section as string) || "foyer");
 const { t } = useI18n();
 
-const { state } = useAsyncState(
-  configClient.query({
-    foyer: {
-      __scalar: true,
-    },
-    system: {
-      __scalar: true,
-    },
-  }),
-  {
-    foyer: null,
-    system: null,
-  },
-);
+const foyer = computed(() => store.getters["config/foyer"]);
+const system = computed(() => store.getters["config/system"]);
 
 const foyerConfigs = () =>
-  state.value.foyer && state.value.system
+foyer && system
     ? [
       h(Entry, {
         label: t("title"),
         name: "FOYER_TITLE",
-        defaultValue: state.value.foyer?.title ?? "",
+        defaultValue: foyer.value.title?.value ?? "",
       }),
       h(Entry, {
         label: t("description"),
         multiline: true,
         name: "FOYER_DESCRIPTION",
-        defaultValue: state.value.foyer?.description ?? "",
+        defaultValue: foyer.value.description?.value ?? "",
         richTextEditor: true
       }),
       h(Entry, {
         label: t("menu"),
         multiline: true,
         name: "FOYER_MENU",
-        defaultValue: state.value.foyer?.menu ?? "",
+        defaultValue: foyer.value.menu?.value ?? "",
         help: h("pre", { class: "text-sm" }, [
           `Syntax: "Title (URL)"
 For example: Development (https://github.com/upstage-org/upstage/)
@@ -62,43 +49,45 @@ About
       h(Entry, {
         label: t("registration_button"),
         name: "SHOW_REGISTRATION",
-        defaultValue: state.value.foyer.showRegistration ?? false,
+        defaultValue: foyer.value.showRegistration?.value ?? false,
       }),
       h(Entry, {
         label: t("enable_upstage_donate"),
         name: "ENABLE_DONATE",
-        defaultValue: state.value.system.enableDonate ?? false,
+        defaultValue: system.value.enableDonate?.value ?? false,
       }),
     ]
     : [h(Skeleton)];
 
 const systemConfigs = () =>
-  state.value.system
+  system
     ? [
       h(Entry, {
         label: t("tos.terms_of_service"),
         name: "TERMS_OF_SERVICE",
-        defaultValue: state.value.system.termsOfService ?? "",
+        defaultValue: system.value.termsOfService?.value ?? "",
       }),
       h(Entry, {
         label: t("manual"),
         name: "MANUAL",
-        defaultValue: state.value.system.manual ?? "",
+        defaultValue: system.value.manual?.value ?? "",
         async refresh() {
-          await settings.execute(0);
+          await store.dispatch("config/fetchConfig");
         },
       }),
       h(Entry, {
         label: t("email_subject_prefix"),
         name: "EMAIL_SUBJECT_PREFIX",
-        defaultValue: state.value.system.esp ?? "",
+        defaultValue: system.value.esp?.value ?? "",
       }),
     ]
     : [h(Skeleton)];
 </script>
 
 <template>
-  <Header><Space><span/></Space></Header>
+  <Header>
+    <Space><span /></Space>
+  </Header>
   <a-layout class="w-full shadow rounded-xl bg-white px-4 overflow-y-auto">
     <a-tabs v-model:activeKey="activeKey" type="card">
       <template #leftExtra>

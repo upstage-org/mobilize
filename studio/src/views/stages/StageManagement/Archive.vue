@@ -64,26 +64,16 @@
       </button>
     </template>
     <template #replay="{ item }">
-      <router-link
-        :to="`/replay/${stage.fileLocation}/${item.id}`"
-        :class="`button ${item.recording ? 'is-primary' : 'is-dark'}`"
-      >
+      <router-link :to="`/replay/${stage.fileLocation}/${item.id}`"
+        :class="`button ${item.recording ? 'is-primary' : 'is-dark'}`">
         <i class="fas fa-video"></i>
       </router-link>
     </template>
     <template #actions="{ item }">
-      <CustomConfirm
-        @confirm="(complete) => updatePerformance(item, complete)"
-        :loading="updating"
-        :only-yes="true"
-      >
+      <CustomConfirm @confirm="(complete) => updatePerformance(item, complete)" :loading="updating" :only-yes="true">
         <Field v-model="item.name" label="Performance Name" required />
         <Field label="Description">
-          <textarea
-            class="textarea"
-            v-model="item.description"
-            rows="3"
-          ></textarea>
+          <textarea class="textarea" v-model="item.description" rows="3"></textarea>
         </Field>
         <template #yes>
           <span>{{ $t("save") }}</span>
@@ -94,10 +84,7 @@
           </button>
         </template>
       </CustomConfirm>
-      <CustomConfirm
-        @confirm="(complete) => deletePerformance(item, complete)"
-        :loading="deleting"
-      >
+      <CustomConfirm @confirm="(complete) => deletePerformance(item, complete)" :loading="deleting">
         <template #trigger>
           <button class="button is-light is-danger">
             <Icon src="delete.svg" />
@@ -107,8 +94,7 @@
           Deleting this performance will also delete
           <span class="has-text-danger">{{
             $t("all_of_its_replay_and_chat")
-          }}</span
-          >. This cannot be undone!
+          }}</span>. This cannot be undone!
           <strong>Are you sure you want to continue?</strong>
         </div>
       </CustomConfirm>
@@ -193,7 +179,7 @@ export default {
       const res = [];
       if (stage.value) {
         const { performances, chats } = stage.value;
-        performances.forEach((p) => {
+        (performances || []).forEach((p) => {
           p.messages = chats
             .filter((c) => c.performanceId === p.id)
             .map((c) => JSON.parse(c.payload));
@@ -246,10 +232,9 @@ export default {
         if (session) {
           link.setAttribute(
             "download",
-            `${stage.value.name}-Audience-chat-${
-              session.end
-                ? timeStamp(session.end)
-                : timeStamp(session.createdOn)
+            `${stage.value.name}-Audience-chat-${session.end
+              ? timeStamp(session.end)
+              : timeStamp(session.createdOn)
             }.txt`,
           );
           content = session.publicMessages.map((item) => {
@@ -282,10 +267,9 @@ export default {
         if (session) {
           link.setAttribute(
             "download",
-            `${stage.value.name}-Player-chat-${
-              session.end
-                ? timeStamp(session.end)
-                : timeStamp(session.createdOn)
+            `${stage.value.name}-Player-chat-${session.end
+              ? timeStamp(session.end)
+              : timeStamp(session.createdOn)
             }.txt`,
           );
           content = session.privateMessages.map((item) => {
@@ -386,7 +370,7 @@ export default {
 </script>
 
 <style scoped>
-.button.is-light > img {
+.button.is-light>img {
   max-width: unset;
 }
 </style>

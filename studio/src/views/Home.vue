@@ -9,8 +9,8 @@
           <img src="/img/foyer-background.png" class="brushstroke" style="top: 11px; right: -277px;" />
         </div> -->
         <div class="describe">
-          <h1 class="title" v-html="foyer.title" />
-          <h2 v-if="foyer.description" class="subtitle" v-html="foyer.description" />
+          <h1 class="title" v-html="foyer.title?.value" />
+          <h2 v-if="foyer.description" class="subtitle" v-html="foyer.description.value" />
         </div>
         <Loading v-if="loading" />
         <div v-else class="stages my-4 pt-6">
@@ -33,21 +33,31 @@ import { absolutePath } from "utils/common";
 import Entry from "components/stage/Entry.vue";
 import MasonryWall from "@yeger/vue-masonry-wall";
 import { stageGraph } from "services/graphql";
-import { useQuery } from "services/graphql/composable";
+import { useQuery } from "@vue/apollo-composable";
+import gql from "graphql-tag";
 
 export default {
   name: "Home",
   components: { Loading, Entry, MasonryWall },
   setup: () => {
     const store = useStore();
-
-    const { nodes: visibleStages, loading } = useQuery(
-      stageGraph.foyerStageList,
-    );
+    const { result, loading } = useQuery(gql`
+      query ListFoyerStage {
+        foyerStageList {
+          id
+          name
+          owner {
+            displayName
+            username
+          }
+          fileLocation
+          cover
+        }
+      }
+    `, null);
     const foyer = computed(() => store.getters["config/foyer"]);
-
     return {
-      visibleStages,
+      visibleStages: result?.foyerStageList || [],
       loading,
       absolutePath,
       foyer,
@@ -68,6 +78,7 @@ export default {
     color: black;
     text-shadow: -3px 0 #007011;
     font-size: 50px;
+
     &:after {
       content: "";
       pointer-events: none;
@@ -89,6 +100,7 @@ export default {
     max-width: 800px;
     margin: auto;
     white-space: pre-wrap;
+
     >:after {
       content: "";
       pointer-events: none;
@@ -118,8 +130,9 @@ export default {
   .describe {
     position: relative;
 
-    
+
   }
+
   .brushstroke {
     position: absolute;
     top: 0px;

@@ -1,32 +1,70 @@
 // @ts-nocheck
 import { gql } from "graphql-request";
-import { createClient } from "./graphql";
-
-const client = createClient("config_graphql");
+import { studioClient } from "../graphql";
 
 export default {
   configs: () =>
-    client.request(gql`
+    studioClient.request(gql`
       query {
         nginx {
-          uploadLimit
+            limit
         }
         system {
-          termsOfService
-          manual
-          esp
-          enableDonate
+            termsOfService {
+                id
+                name
+                value
+                createdOn
+            }
+            manual {
+                id
+                name
+                value
+                createdOn
+            }
+            esp {
+                id
+                name
+                value
+                createdOn
+            }
+            enableDonate {
+                id
+                name
+                value
+                createdOn
+            }
         }
         foyer {
-          title
-          description
-          menu
-          showRegistration
+            title {
+                id
+                name
+                value
+                createdOn
+            }
+            description {
+                id
+                name
+                value
+                createdOn
+            }
+            menu {
+                id
+                name
+                value
+                createdOn
+            }
+            showRegistration {
+                id
+                name
+                value
+                createdOn
+            }
         }
       }
     `),
   updateTermsOfService: (variables) =>
-    client.request(
+    studioClient.request(
       gql`
         mutation UpdateTermsOfService($url: String!) {
           updateTermsOfService(url: $url) {
@@ -37,18 +75,23 @@ export default {
       variables,
     ),
   saveConfig: (name, value) =>
-    client.request(
+    studioClient.request(
       gql`
         mutation SaveConfig($name: String!, $value: String!) {
-          saveConfig(name: $name, value: $value) {
-            success
+          saveConfig(input: {
+          name: $name
+          value: $value
+        }) {
+            id
+            name
+            value
           }
         }
       `,
       { name, value },
     ),
   sendEmail: (variables) =>
-    client.request(
+    studioClient.request(
       gql`
         mutation SendEmail(
           $subject: String!
@@ -56,12 +99,12 @@ export default {
           $recipients: String!
           $bcc: String
         ) {
-          sendEmail(
+          sendEmail(input:{
             subject: $subject
             body: $body
             recipients: $recipients
             bcc: $bcc
-          ) {
+          }) {
             success
           }
         }

@@ -28,6 +28,18 @@ export default {
     },
   },
   actions: {
+    async updateUserProfile({ commit }, payload) {
+      commit("SET_LOADING_USER", true);
+      try {
+        const { updateUser } = await userGraph.updateUser(payload);
+        commit("SET_USER_DATA", updateUser);
+        return updateUser;
+      } catch (error) {
+        message.warning("Failed update!");
+      } finally {
+        commit("SET_LOADING_USER", false);
+      }
+    },
     async fetchCurrent({ commit }) {
       commit("SET_LOADING_USER", true);
       try {
@@ -37,7 +49,7 @@ export default {
       } catch (error) {
         if (
           [
-            "Missing X-Access-Token Header",
+            "Missing Authorization Header",
             "Signature verification failed",
             "Signature has expired",
           ].some((message) => error.message?.includes(message))
@@ -78,11 +90,11 @@ export default {
       commit("SET_LOADING_USER", true);
       try {
         const { currentUser } = await userGraph.currentUser();
-        return [ROLES.ADMIN, ROLES.SUPER_ADMIN].includes(currentUser?.role);
+        return [String(ROLES.ADMIN), String(ROLES.SUPER_ADMIN)].includes(String(currentUser?.role));
       } catch (error) {
         if (
           [
-            "Missing X-Access-Token Header",
+            "Missing Authorization Header",
             "Signature verification failed",
             "Signature has expired",
           ].some((message) => error.message?.includes(message))
@@ -105,14 +117,14 @@ export default {
         if (!currentUser) {
           return true;
         }
-        if (currentUser.role === ROLES.GUEST) {
+        if (String(currentUser.role) === String(ROLES.GUEST)) {
           return true;
         }
         return false;
       } catch (error) {
         if (
           [
-            "Missing X-Access-Token Header",
+            "Missing Authorization Header",
             "Signature verification failed",
             "Signature has expired",
           ].some((message) => error.message?.includes(message))
@@ -130,6 +142,9 @@ export default {
     },
   },
   getters: {
+    whoami(state) {
+      return state.user;
+    },
     nickname(state) {
       return state.nickname ?? (state.user ? displayName(state.user) : "Guest");
     },
@@ -142,13 +157,13 @@ export default {
       return name;
     },
     isAdmin(state) {
-      return [ROLES.ADMIN, ROLES.SUPER_ADMIN].includes(state.user?.role);
+      return [String(ROLES.ADMIN), String(ROLES.SUPER_ADMIN)].includes(String(state.user?.role));
     },
     isGuest(state) {
       if (!state.user) {
         return true;
       }
-      if (state.user.role === ROLES.GUEST) {
+      if (String(state.user.role) === String(ROLES.GUEST)) {
         return true;
       }
       return false;

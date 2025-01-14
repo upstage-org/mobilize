@@ -2,7 +2,6 @@
 import { LayoutSider, Menu, MenuItem, Spin, SubMenu } from "ant-design-vue";
 import { useRouter } from "vue-router";
 import PlayerForm from "views/admin/player-management/PlayerForm.vue";
-import { useUpdateProfile } from "state/auth";
 import { h, computed } from "vue";
 import {
   PictureOutlined,
@@ -13,20 +12,22 @@ import {
 } from "@ant-design/icons-vue";
 import configs from "config";
 import { useLoading } from "hooks/mutations";
-import { settings } from "state/settings";
+import { userGraph } from "services/graphql";
+import { useStore } from "vuex";
 
 export default {
   setup(_, { slots }) {
     const router = useRouter();
 
-    const { whoami, updateProfile: save, loading: saving } = useUpdateProfile();
+    const store = useStore();
+    const whoami = computed(() => store.getters["user/whoami"]);
+    const saving = computed(() => store.getters["user/loading"]);
+    const system = computed(() => store.getters["config/system"]);
 
     const isAdmin = computed(
       () =>
         whoami.value &&
-        [configs.ROLES.ADMIN, configs.ROLES.SUPER_ADMIN].includes(
-          whoami.value.role,
-        ),
+        [String(configs.ROLES.ADMIN), String(configs.ROLES.SUPER_ADMIN)].includes(String(whoami.value.role)),
     );
     return () => h(
       LayoutSider,
@@ -56,7 +57,7 @@ export default {
                     {
                       player: whoami.value,
                       saving: saving.value,
-                      onSave: save as any,
+                      onSave: userGraph.updateUser as any,
                       noUploadLimit: true,
                       noStatusToggle: true,
                     },
@@ -124,10 +125,10 @@ export default {
               {
                 icon: ReadOutlined,
                 label: "Manual",
-                disabled: !settings.isReady.value,
+                disabled: !system.value.manual,
                 onClick: () =>
                   open(
-                    settings.state.value.system?.manual ??
+                    system.value.manual.value ??
                     "https://docs.upstage.live/",
                     "_blank",
                   ),

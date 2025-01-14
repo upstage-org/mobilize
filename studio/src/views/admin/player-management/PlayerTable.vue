@@ -15,8 +15,6 @@ import type { DefaultOptionType } from "ant-design-vue/lib/select";
 import Confirm from "components/Confirm.vue";
 import { useUpdateUser } from "hooks/mutations";
 import { useAsyncState } from "@vueuse/core";
-import { studioClient } from "services/graphql";
-import { AdminPlayerSortEnum, User } from "genql/studio";
 import { computed, ComputedRef } from "vue";
 import { useQuery } from "@vue/apollo-composable";
 import gql from "graphql-tag";
@@ -41,9 +39,9 @@ export default {
     const query: SortQueryParams = router.currentRoute.value.query;
 
     const tableParams = reactive({
-      first: 10,
-      after: undefined,
-      sort: [query.sortByCreated ? "CREATED_ON_DESC" : "CREATED_ON_ASC"] as AdminPlayerSortEnum[],
+      page: 1,
+      limit: 10,
+      sort: [query.sortByCreated ? "CREATED_ON_DESC" : "CREATED_ON_ASC"],
     });
     const { result: inquiryResult } = useQuery(gql`
       {
@@ -54,43 +52,43 @@ export default {
       ...tableParams,
       ...inquiryResult.value.inquiry,
     }));
-    watch(inquiryResult, () => {
-      tableParams.after = undefined;
-    });
 
-    const {
-      state: result,
-      isReady,
-      execute: fetchMore,
-    } = useAsyncState(
-      () => {
-        return studioClient.query({
-          adminPlayers: {
-            __args: {
-              ...tableParams,
-              usernameLike: params.value.name,
-              createdBetween: params.value.createdBetween,
-            },
-            totalCount: true,
-            edges: {
-              cursor: true,
-              node: {
-                __scalar: true,
-              },
-            },
-          },
-        });
-      },
-      {
-        adminPlayers: null,
-      },
+    const { result, loading, fetchMore, refetch } = useQuery(
+      gql`
+          query adminPlayersTable(
+            $page: Int
+            $limit: Int
+          ) {
+            adminPlayers(page: $page limit: $limit) {
+              totalCount
+              edges {
+                id
+                username
+                email
+                role
+                firstName
+                lastName
+                displayName
+                active
+                createdOn
+                uploadLimit
+                intro
+                canSendEmail
+                lastLogin
+                roleName
+              }
+            }
+          }
+        `,
+      tableParams,
+      { notifyOnNetworkStatusChange: true },
     );
 
     watch(params, () => {
-      refresh();
+      refetch();
     });
 
-    const columns: ComputedRef<ColumnType<User>[]> = computed((): ColumnType<User>[] => [
+    const columns: ComputedRef<ColumnType<any>[]> = computed((): ColumnType<any>[] => [
       {
         title: t("role"),
         dataIndex: "role",
@@ -126,7 +124,7 @@ export default {
               }) =>
                 h(Select, {
                   options: Object.entries(configs.ROLES).map(([key, id]) => ({
-                    value: id,
+                    value: String(id),
                     label: titleCase(key),
                   })),
                   value: opt.text,
@@ -223,7 +221,7 @@ export default {
             h(PlayerForm, {
               player: opt.record,
               saving: savingUser.value,
-              onSave: async (player: User) => {
+              onSave: async (player) => {
                 await updateUser({
                   ...player,
                 });
@@ -234,7 +232,7 @@ export default {
             h(ChangePassword, {
               player: opt.record,
               saving: savingUser,
-              onSave: async (player: User) => {
+              onSave: async (player) => {
                 await updateUser(
                   {
                     ...player,
@@ -248,7 +246,7 @@ export default {
             }),
             h(DeletePlayer, {
               player: opt.record,
-              onDone: async (player: User) => {
+              onDone: async (player) => {
                 refresh();
                 message.success(
                   `Successfully delete ${displayName(player)}'s account!`,
@@ -275,19 +273,18 @@ export default {
           `${columnKey}_${order === "ascend" ? "ASC" : "DESC"}`.toUpperCase(),
         );
       Object.assign(tableParams, {
-        after:
-          current > 1
-            ? window.btoa(`arrayconnection:${(current - 1) * pageSize}`)
-            : undefined,
-        first: pageSize,
+        page: current,
+        limit: pageSize,
         sort,
       });
     };
 
     const refresh = () => {
-      fetchMore(0);
+      refetch();
     };
-    provide("refresh", refresh);
+    provide("refresh", () => {
+      refetch();
+    });
 
     const { proceed: updateUser, loading: savingUser } = useUpdateUser({
       loading: "Saving player information...",
@@ -308,13 +305,13 @@ export default {
             class: "w-full overflow-auto",
             rowKey: "id",
             columns: columns.value,
-            dataSource: result.value.adminPlayers?.edges.map((e) => e?.node),
-            loading: !isReady.value,
+            dataSource: result.value?.adminPlayers?.edges || [],
+            loading: loading.value,
             onChange: handleTableChange,
             pagination: {
               showQuickJumper: true,
               showSizeChanger: true,
-              total: result.value.adminPlayers
+              total: result.value?.adminPlayers
                 ? result.value.adminPlayers.totalCount
                 : 0,
             } as Pagination,

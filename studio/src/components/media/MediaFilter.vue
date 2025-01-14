@@ -10,7 +10,7 @@ import configs from "config";
 import { capitalize, getSharedAuth } from "utils/common";
 import Navbar from "../Navbar.vue";
 
-const { result, loading } = useQuery<StudioGraph>(gql`
+const { result, loading } = useQuery(gql`
   {
     whoami {
       username
@@ -18,40 +18,30 @@ const { result, loading } = useQuery<StudioGraph>(gql`
       roleName
     }
     users(active: true) {
-      edges {
-        node {
-          dbId
-          displayName
-          username
-        }
-      }
+      id
+      username
+      displayName
     }
-    stages {
+    stages(input:{}) {
       edges {
-        node {
-          dbId
-          name
-          createdOn
-          owner {
-            username
-            displayName
-          }
+        id
+        name
+        createdOn
+        owner {
+          username
+          displayName
         }
       }
     }
     tags {
-      edges {
-        node {
-          name
-        }
-      }
+      id
+      name
+      color
+      createdOn
     }
     mediaTypes {
-      edges {
-        node {
-          name
-        }
-      }
+      id
+      name
     }
   }
 `);
@@ -91,7 +81,6 @@ const updateInquiry = (vars: any) =>
 const watchInquiryVar = (vars: any) => {
   types.value = vars.mediaTypes ?? [];
   tags.value = vars.tags ?? [];
-  console.log(vars);
   inquiryVar.onNextChange(watchInquiryVar);
 };
 inquiryVar.onNextChange(watchInquiryVar);
@@ -114,9 +103,9 @@ watch(dates, (dates) => {
   updateInquiry({
     createdBetween: dates
       ? [
-          dates[0].startOf("day").format("YYYY-MM-DD"),
-          dates[1].endOf("day").format("YYYY-MM-DD"),
-        ]
+        dates[0].startOf("day").format("YYYY-MM-DD"),
+        dates[1].endOf("day").format("YYYY-MM-DD"),
+      ]
       : undefined,
   });
 });
@@ -161,10 +150,9 @@ const createRTMPStream = () => {
         url: "",
         status: "virtual",
         file: {
-          name: result.value
-            ? `${
-                result.value.whoami.displayName || result.value.whoami.username
-              }'s stream`
+          name: result?.value
+            ? `${result.value.whoami.displayName || result.value.whoami.username
+            }'s stream`
             : "Stream name",
           type: "video",
         } as File,
@@ -182,22 +170,13 @@ const VNodes = (_: any, { attrs }: { attrs: any }) => {
   <a-affix :offset-top="0">
     <a-space class="shadow rounded-xl px-4 py-2 bg-white flex justify-between">
       <a-space class="flex-wrap">
-        <a-button
-          v-if="composingMode"
-          type="primary"
-          danger
-          @click="composingMode = false"
-        >
+        <a-button v-if="composingMode" type="primary" danger @click="composingMode = false">
           <template #icon>
             <RollbackOutlined />
           </template>
           Back to editing
         </a-button>
-        <a-dropdown-button
-          type="primary"
-          v-else
-          @click="visibleDropzone = true"
-        >
+        <a-dropdown-button type="primary" v-else @click="visibleDropzone = true">
           <PlusOutlined /> {{ $t("new") }} {{ $t("media") }}
           <template #overlay>
             <a-menu>
@@ -210,107 +189,56 @@ const VNodes = (_: any, { attrs }: { attrs: any }) => {
             </a-menu>
           </template>
         </a-dropdown-button>
-        <a-input-search
-          allowClear
-          class="w-48"
-          placeholder="Search media"
-          v-model:value="name"
-        />
-        <a-select
-          allowClear
-          showArrow
-          :filterOption="handleFilterOwnerName"
-          mode="tags"
-          style="min-width: 124px"
-          placeholder="Owners"
-          :loading="loading"
-          v-model:value="owners"
-          :options="
-            result
-              ? result.users.edges.map((e) => ({
-                  value: e.node.username,
-                  label: e.node.displayName || e.node.username,
-                }))
+        <a-input-search allowClear class="w-48" placeholder="Search media" v-model:value="name" />
+        <a-select allowClear showArrow :filterOption="handleFilterOwnerName" mode="tags" style="min-width: 124px"
+          placeholder="Owners" :loading="loading" v-model:value="owners" :options="result?.value
+              ? result.value.users.map((e) => ({
+                value: e.username,
+                label: e.displayName || e.username,
+              }))
               : []
-          "
-        >
+            ">
           <template #dropdownRender="{ menuNode: menu }">
             <v-nodes :vnodes="menu" />
             <a-divider style="margin: 4px 0" />
-            <div
-              class="w-full cursor-pointer text-center"
-              @mousedown.prevent
-              @click.stop.prevent="owners = []"
-            >
+            <div class="w-full cursor-pointer text-center" @mousedown.prevent @click.stop.prevent="owners = []">
               <team-outlined />&nbsp;All players
             </div>
           </template>
         </a-select>
-        <a-select
-          allowClear
-          showArrow
-          filterOption
-          mode="tags"
-          style="min-width: 128px"
-          placeholder="Media types"
-          :loading="loading"
-          v-model:value="types"
-          :options="
-            result
-              ? result.mediaTypes.edges
-                  .filter(
-                    (e) =>
-                      !['shape', 'media'].includes(e.node.name.toLowerCase()),
-                  )
-                  .map((e) => ({
-                    value: e.node.name,
-                    label: capitalize(e.node.name),
-                  }))
-              : []
-          "
-        >
-        </a-select>
-        <a-select
-          allowClear
-          showArrow
-          :filterOption="handleFilterStageName"
-          mode="tags"
-          style="min-width: 160px"
-          placeholder="Stages assigned"
-          :loading="loading"
-          v-model:value="stages"
-          :options="
-            result
-              ? result.stages.edges.map((e) => ({
-                  value: e.node.dbId,
-                  label: e.node.name,
+        <a-select allowClear showArrow filterOption mode="tags" style="min-width: 128px" placeholder="Media types"
+          :loading="loading" v-model:value="types" :options="result?.value
+              ? result.value.mediaTypes
+                .filter(
+                  (e) =>
+                    !['shape', 'media'].includes(e.name.toLowerCase()),
+                )
+                .map((e) => ({
+                  value: e.name,
+                  label: capitalize(e.name),
                 }))
               : []
-          "
-        >
+            ">
         </a-select>
-        <a-select
-          allowClear
-          showArrow
-          mode="tags"
-          style="min-width: 160px"
-          placeholder="Tags"
-          :loading="loading"
-          v-model:value="tags"
-          :options="
-            result
-              ? result.tags.edges.map((e) => ({
-                  value: e.node.name,
-                  label: e.node.name,
-                }))
+        <a-select allowClear showArrow :filterOption="handleFilterStageName" mode="tags" style="min-width: 160px"
+          placeholder="Stages assigned" :loading="loading" v-model:value="stages" :options="result?.value
+              ? result.value.stages.map((e) => ({
+                value: e.id,
+                label: e.name,
+              }))
               : []
-          "
-        ></a-select>
-        <a-range-picker
-          :placeholder="['Created from', 'to date']"
-          v-model:value="dates as any"
-          :ranges="ranges as any"
-        />
+            ">
+        </a-select>
+        <a-select allowClear showArrow mode="tags" style="min-width: 160px" placeholder="Tags" :loading="loading"
+          v-model:value="tags" :options="result?.value
+              ? result.value.tags.map((e) => ({
+                value: e.name,
+                label: e.name,
+              }))
+              : []
+            "></a-select>
+        <a-range-picker :placeholder="['Created from', 'to date']" v-model:value="dates as any"
+          :ranges="ranges as any" />
         <a-button v-if="hasFilter" type="dashed" @click="clearFilters">
           <ClearOutlined />Clear Filters
         </a-button>

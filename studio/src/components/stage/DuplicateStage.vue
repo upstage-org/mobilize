@@ -51,7 +51,7 @@ const duplicateStage = async (complete) => {
   ClearCache();
   refresh();
   router.push(
-    `/stages/stage-management/${result.duplicateStage.newStageId}/`,
+    `/stages/stage-management/${result.duplicateStage.id}/`,
   );
   console.log(result);
 };

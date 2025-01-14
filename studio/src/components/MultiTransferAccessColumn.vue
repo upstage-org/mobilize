@@ -60,7 +60,7 @@ import { watch } from "vue";
 import { includesIgnoreCase } from "utils/common";
 export default {
   props: {
-    columns: Number,
+    columns: Array,
     modelValue: Array,
     data: { type: Array, default: () => [] },
     owner: Object,

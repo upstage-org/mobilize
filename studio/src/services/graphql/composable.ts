@@ -4,15 +4,15 @@ import { computed, reactive, ref } from "vue";
 import hash from "object-hash";
 import { message } from "ant-design-vue";
 import { configGraph } from "services/graphql";
-
+import { logout } from "utils/auth";
 
 export const useRequest = (service, ...params) => {
   const loading = ref(false);
   const data = ref();
   const nodes = computed(() => {
     if (!data.value) return null;
-    const key = Object.keys(data.value)[0];
-    return data.value[key].edges.map((edge) => edge.node);
+    const value = Object.values(data.value)[0];
+    return Array.isArray(value) ? value : [value];
   });
   const pushNode = (node, reverse) => {
     if (data.value) {
@@ -62,6 +62,9 @@ export const useRequest = (service, ...params) => {
       }
       return data.value;
     } catch (error) {
+      if (error.response.errors[0].message == "Invalid refresh token") {
+        logout();
+      }
       throw error.response.errors[0].message;
     } finally {
       loading.value = false;
@@ -135,9 +138,7 @@ export const useFirst = (nodes) => {
 
 export function useAttribute(node, attributeName, isJson) {
   return computed(() => {
-    let value = node.value?.attributes?.find(
-      (a) => a.name === attributeName,
-    )?.description;
+    let value = node.value ? node.value[attributeName] : null;
     if (isJson && value) {
       value = JSON.parse(value);
     }

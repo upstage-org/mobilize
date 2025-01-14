@@ -1,6 +1,5 @@
 // @ts-nocheck
 import { userGraph } from "services/graphql";
-import { authService } from "services/rest";
 
 import {
   setToken,
@@ -8,6 +7,7 @@ import {
   setRefreshToken,
   removeRefreshToken,
 } from "utils/auth";
+import { message } from "ant-design-vue";
 
 export default {
   namespaced: true,
@@ -34,21 +34,27 @@ export default {
   actions: {
     login({ commit }, user) {
       return new Promise((resolve, reject) => {
-        authService
+        userGraph
           .login(user)
-          .then(async (resp) => {
-            if (resp) {
-              const { access_token, refresh_token } = resp;
+          .then((resp) => {
+            if (resp?.login?.access_token) {
+              const { access_token, refresh_token, username } = resp.login;
               setToken(access_token);
               setRefreshToken(refresh_token);
-              commit("SET_USERNAME", user.username);
+              commit("SET_USERNAME", username);
               commit("SET_TOKEN", access_token);
               commit("SET_REFRESH_TOKEN", refresh_token);
-              //              await dispatch("user/fetchCurrent", null, { root: true });
               resolve();
+            } else {
+              message.error(
+                resp?.errors[0]?.message
+              );
+              reject(resp);
             }
-          })
-          .catch((err) => {
+          }).catch((err) => {
+            message.error(
+              err.response?.errors ? err.response?.errors[0].message: "Error!"
+            );
             reject(err);
           });
       });
@@ -58,7 +64,10 @@ export default {
       localStorage.clear();
       removeToken();
       removeRefreshToken();
+      window.location.href = "/";
     },
+
+
     // eslint-disable-next-line no-unused-vars
     fetchRefreshToken({ commit, state }) {
       return userGraph
@@ -71,7 +80,7 @@ export default {
           },
         )
         .then((response) => {
-          const token = response.refreshUser.newToken;
+          const token = response.refreshToken.access_token;
           commit("SET_TOKEN", token);
           return token;
         });

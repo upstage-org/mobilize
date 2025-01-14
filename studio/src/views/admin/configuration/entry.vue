@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { useLoading } from "hooks/mutations";
-import { configClient } from "services/graphql";
 import { VNode } from "vue";
 import { ref } from "vue";
 import RichTextEditor from "components/editor/RichTextEditor.vue";
 import { boxShadow } from "html2canvas/dist/types/css/property-descriptors/box-shadow";
+import { configGraph } from 'services/graphql';
 
 const props = defineProps<{
   name: string;
@@ -19,22 +19,7 @@ const props = defineProps<{
 const editing = ref(false);
 const value = ref(props.defaultValue);
 
-const { loading, proceed } = useLoading(
-  () =>
-    configClient.mutation({
-      saveConfig: {
-        __args: {
-          name: props.name,
-          value: !value.value ? "" : String(value.value),
-        },
-        success: true,
-      },
-    }),
-  {
-    loading: "Saving config...",
-    success: () => "Config saved successfully!",
-  },
-);
+const { loading, proceed } = useLoading(async () => configGraph.saveConfig(props.name, !value.value ? "" : String(value.value)));
 
 const save = async () => {
   editing.value = false;
@@ -50,9 +35,9 @@ const save = async () => {
     <template v-if="typeof value === 'string'">
       <a-input-group compact style="display: flex">
         <RichTextEditor v-if="richTextEditor" :readonly="!editing" v-model="value" :style="{
-    boxShadow: 'none',
-    pointerEvents: editing ? 'auto' : 'none'
-  }" />
+          boxShadow: 'none',
+          pointerEvents: editing ? 'auto' : 'none'
+        }" />
         <template v-else>
           <a-textarea v-if="props.multiline" :disabled="!editing" v-model:value="value" style="color: black"
             auto-size></a-textarea>

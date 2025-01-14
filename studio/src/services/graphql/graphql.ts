@@ -11,12 +11,12 @@ export const createClient = (namespace: any) => ({
       headers: {},
     };
     const client = new GraphQLClient(
-      `${config.GRAPHQL_ENDPOINT}${namespace}/`,
+      `${config.GRAPHQL_ENDPOINT}${namespace}`,
       options,
     );
     const token = store.getters["auth/getToken"];
     if (token) {
-      client.setHeader("X-Access-Token", token);
+      client.setHeader("Authorization", `Bearer ${token}`);
     }
     try {
       response = await client.request(...params);
@@ -31,7 +31,7 @@ export const createClient = (namespace: any) => ({
         error.response.errors[0].message === "Signature has expired"
       ) {
         const newToken = await store.dispatch("auth/fetchRefreshToken");
-        client.setHeader("X-Access-Token", newToken);
+        client.setHeader("Authorization", `Bearer ${newToken}`);
         response = await client.request(...params);
       } else {
         throw error;

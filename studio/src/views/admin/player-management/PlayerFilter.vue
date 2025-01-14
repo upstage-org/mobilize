@@ -16,18 +16,16 @@ import BatchPlayerCreation from "views/admin/batch-player-creation/index.vue";
 
 export default {
   setup() {
-    const { result, loading } = useQuery<StudioGraph>(gql`
-      query AdminPlayerFilter {
-        adminPlayers {
-          edges {
-            node {
-              id
-              username
-            }
-          }
-        }
-      }
-    `);
+    // const { result, loading } = useQuery<StudioGraph>(gql`
+    //   query AdminPlayerFilter {
+    //     adminPlayers {
+    //       edges {
+    //         id
+    //         username
+    //       }
+    //     }
+    //   }
+    // `);
 
     const sharedAuth = getSharedAuth();
 
@@ -56,7 +54,6 @@ export default {
       });
 
     const watchInquiryVar = (vars: any) => {
-      console.log(vars);
       inquiryVar.onNextChange(watchInquiryVar);
     };
     inquiryVar.onNextChange(watchInquiryVar);
@@ -71,9 +68,9 @@ export default {
       updateInquiry({
         createdBetween: dates
           ? [
-              dates[0].startOf("day").format("YYYY-MM-DD"),
-              dates[1].endOf("day").format("YYYY-MM-DD"),
-            ]
+            dates[0].startOf("day").format("YYYY-MM-DD"),
+            dates[1].endOf("day").format("YYYY-MM-DD"),
+          ]
           : undefined,
       });
     });
@@ -129,19 +126,19 @@ export default {
               ranges,
             }),
             hasFilter.value &&
-              h(
-                Button,
-                {
-                  type: "dashed",
-                  onClick: clearFilters,
-                },
-                [
-                  h("a-icon", {
-                    type: "close-circle",
-                  }),
-                  "Clear Filters",
-                ],
-              ),
+            h(
+              Button,
+              {
+                type: "dashed",
+                onClick: clearFilters,
+              },
+              [
+                h("a-icon", {
+                  type: "close-circle",
+                }),
+                "Clear Filters",
+              ],
+            ),
           ],
         ),
       ]),

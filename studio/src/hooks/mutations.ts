@@ -1,8 +1,8 @@
+// @ts-nocheck
 import { message } from "ant-design-vue";
-import { UpdateUserInput, User } from "genql/studio";
-import { studioClient } from "services/graphql";
 import { ref } from "vue";
-
+import { useStore } from "vuex";
+const store = useStore();
 export function useLoading<T extends unknown[], U>(
   operation: (...params: T) => Promise<U>,
   messages?: {
@@ -51,11 +51,12 @@ export function useLoading<T extends unknown[], U>(
       } catch (error) {
         if (messages) {
           message.error({
-            content: messages.error ? messages.error(error) : (error as string),
+            content: messages.error ? messages.error(error) : (typeof error == "string" ? error : error.response?.errors[0].message),
             key,
             duration: messages.seconds,
           });
         }
+        loading.value = false;
       } finally {
         loading.value = false;
       }
@@ -64,7 +65,7 @@ export function useLoading<T extends unknown[], U>(
 }
 
 export function useUpdateUser(messages?: Parameters<typeof useLoading>[1]) {
-  return useLoading((user: User, includingPassword?: boolean) => {
+  return useLoading((user: any, includingPassword?: any) => {
     const {
       username,
       password,
@@ -79,7 +80,7 @@ export function useUpdateUser(messages?: Parameters<typeof useLoading>[1]) {
       intro,
       id,
     } = user;
-    const inbound: UpdateUserInput = {
+    const inbound = {
       username,
       email,
       binName,
@@ -95,15 +96,6 @@ export function useUpdateUser(messages?: Parameters<typeof useLoading>[1]) {
     if (includingPassword) {
       inbound.password = password;
     }
-    return studioClient.mutation({
-      updateUser: {
-        __args: {
-          inbound,
-        },
-        user: {
-          __scalar: true,
-        },
-      },
-    });
+    return;
   }, messages);
 }

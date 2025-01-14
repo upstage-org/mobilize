@@ -4,7 +4,6 @@ export default {
   next: "Seguente",
   finish: "Acabar",
   foyer: "Lar",
-  studio: "Studio",
   logout: "Disconectar",
   login: "Conexão",
   register: "Registrarse",

@@ -7,7 +7,6 @@ import RichTextEditor from "components/editor/RichTextEditor.vue";
 import configs from "config";
 import { enableExperimentalFragmentVariables } from "graphql-tag";
 import { useLoading } from "hooks/mutations";
-import { studioClient } from "services/graphql";
 import { displayName, titleCase } from "utils/common";
 import { reactive } from "vue";
 import { computed } from "vue";
@@ -15,6 +14,8 @@ import { watch } from "vue";
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 import Header from "components/Header.vue";
+import { userGraph, configGraph } from 'services/graphql';
+import { ROLES } from "utils/constants";
 
 const { t } = useI18n();
 
@@ -39,8 +40,8 @@ const addCustomRecipient = () => {
         receiverEmails.value = receiverEmails.value.concat(email);
       }
       if (
-        !receivers.value.adminPlayers?.edges.some(
-          (e) => e?.node?.email === email,
+        !receivers?.value?.adminPlayers?.edges.some(
+          (e: any) => e?.email === email,
         )
       ) {
         customRecipients.value = customRecipients.value.concat(email);
@@ -57,22 +58,7 @@ const {
   execute,
 } = useAsyncState(
   () =>
-    studioClient.query({
-      adminPlayers: {
-        __args: {
-          role: filterRole.value,
-        },
-        edges: {
-          node: {
-            username: true,
-            email: true,
-            displayName: true,
-            firstName: true,
-            lastName: true,
-          },
-        },
-      },
-    }),
+    userGraph.adminPlayers(),
   { adminPlayers: null },
   { resetOnExecute: false },
 );
@@ -86,10 +72,10 @@ const dataSource = computed<TransferItem[]>(() => {
       title: email,
     }))
     .concat(
-      receivers.value.adminPlayers?.edges.map<TransferItem>((user, i) => ({
-        key: user?.node?.email ?? `${i}`,
-        title: user?.node
-          ? `${displayName(user.node)} <${user.node.email}>`
+      receivers.value.adminPlayers?.edges.filter((user: any) => String(user.role) == String(ROLES.ADMIN)).map((user: any, i: any) => ({
+        key: user?.email ?? `${i}`,
+        title: user
+          ? `${displayName(user)} <${user.email}>`
           : "",
       })) ?? [],
     );
@@ -114,27 +100,22 @@ const { proceed, loading } = useLoading(
     }
     const visibleReceivers = receiverEmails.value.filter((email) =>
       receivers.value.adminPlayers?.edges.some(
-        (edge) => edge?.node?.email === email,
+        (edge: any) => edge?.email === email,
       ),
     );
     if (!visibleReceivers.length) {
       throw "Please select at least one recipient";
     }
     receiverEmails.value = visibleReceivers;
-    await studioClient.mutation({
-      sendEmail: {
-        __args: {
-          subject: subject.value,
-          body: body.value,
-          recipients: receiverEmails.value
-            .filter((email) => directToEmails.value.includes(email))
-            .join(","),
-          bcc: receiverEmails.value
-            .filter((email) => !directToEmails.value.includes(email))
-            .join(","),
-        },
-        success: true,
-      },
+    await configGraph.sendEmail({
+      subject: subject.value,
+      body: body.value,
+      recipients: receiverEmails.value
+        .filter((email) => directToEmails.value.includes(email))
+        .join(","),
+      bcc: receiverEmails.value
+        .filter((email) => !directToEmails.value.includes(email))
+        .join(","),
     });
     successMessage.value = `Email has been successfully sent to ${receiverEmails.value
       .map((email) =>
@@ -150,25 +131,20 @@ const { proceed, loading } = useLoading(
 </script>
 
 <template>
-  <Header><Space><span/></Space></Header>
-  <Layout
-    v-if="successMessage"
-    class="bg-white rounded-lg overflow-y-auto justify-center"
-  >
-    <AResult
-      status="success"
-      title="Email notification sent"
-      class="text-center"
-      :sub-title="successMessage"
-    >
+  <Header>
+    <Space><span /></Space>
+  </Header>
+  <Layout v-if="successMessage" class="bg-white rounded-lg overflow-y-auto justify-center">
+    <AResult status="success" title="Email notification sent" class="text-center" :sub-title="successMessage">
       <AButton class="m-auto" @click="reset()">Send another email</AButton>
     </AResult>
   </Layout>
   <Layout v-else class="bg-white rounded-lg overflow-y-auto">
     <div
-      class="bg-white shadow rounded-tl rounded-tr p-2 px-4 sticky top-0 z-50 mb-6 flex justify-between items-center"
-    >
-      <a-tag color="#007011"> <MailOutlined /> Email Notification </a-tag>
+      class="bg-white shadow rounded-tl rounded-tr p-2 px-4 sticky top-0 z-50 mb-6 flex justify-between items-center">
+      <a-tag color="#007011">
+        <MailOutlined /> Email Notification
+      </a-tag>
       <a-button type="primary" @click="proceed" :loading="loading">
         <send-outlined />
         Send
@@ -185,24 +161,15 @@ const { proceed, loading } = useLoading(
       <CloseCircleFilled />. Once the filter is cleared, all the players you
       have selected will show in the recipient list.
       <ADivider />
-      <a-form-item
-        :label-col="{ xl: { span: 4 }, xxl: { span: 3 } }"
-        :colon="false"
-      >
+      <a-form-item :label-col="{ xl: { span: 4 }, xxl: { span: 3 } }" :colon="false">
         <template #label>
           <a-space direction="vertical">
             {{ t("to") }}
-            <a-select
-              allow-clear
-              placeholder="Filter by role"
-              :options="
-                Object.entries(configs.ROLES).map(([key, id]) => ({
-                  value: id,
-                  label: titleCase(key),
-                }))
-              "
-              v-model:value="filterRole"
-            />
+            <a-select allow-clear placeholder="Filter by role" :options="Object.entries(configs.ROLES).map(([key, id]) => ({
+              value: id,
+              label: titleCase(key),
+            }))
+              " v-model:value="filterRole" />
             <a-button type="dashed" @click="addCustomRecipient">
               <plus-circle-outlined />
               Custom recipient
@@ -210,45 +177,32 @@ const { proceed, loading } = useLoading(
           </a-space>
         </template>
         <a-spin :spinning="!isReady">
-          <a-transfer
-            :locale="{
-              itemUnit: 'recipient',
-              itemsUnit: 'recipients',
-              notFoundContent: '',
-              searchPlaceholder: 'Search by email or name',
-            }"
-            :list-style="{
-              flex: '1',
-              height: '300px',
-            }"
-            :titles="[' available', ' selected']"
-            v-model:target-keys="receiverEmails"
-            :data-source="dataSource"
-            show-search
-            :filter-option="
-              (keyword, option) =>
-                option.title?.toLowerCase().includes(keyword.toLowerCase()) ??
-                false
-            "
-          >
+          <a-transfer :locale="{
+            itemUnit: 'recipient',
+            itemsUnit: 'recipients',
+            notFoundContent: '',
+            searchPlaceholder: 'Search by email or name',
+          }" :list-style="{
+            flex: '1',
+            height: '300px',
+          }" :titles="[' available', ' selected']" v-model:target-keys="receiverEmails" :data-source="dataSource"
+            show-search :filter-option="(keyword, option) =>
+              option.title?.toLowerCase().includes(keyword.toLowerCase()) ??
+              false
+              ">
             <template #render="item">
               <a-space class="flex justify-between">
                 <span>
                   {{ item?.title }}
                   <a-tag v-if="!item?.title?.includes('<')">Custom recipient</a-tag>
                 </span>
-                <a-switch
-                  size="small"
-                  :checked="!directToEmails.includes(item?.key as string)"
-                  @change="
-                    (checked, e) => {
-                      directToEmails = directToEmails
-                        .filter((email) => email !== item?.key)
-                        .concat(checked ? [] : (item?.key as string));
-                      e.stopPropagation();
-                    }
-                  "
-                >
+                <a-switch size="small" :checked="!directToEmails.includes(item?.key as string)" @change="(checked, e) => {
+                  directToEmails = directToEmails
+                    .filter((email) => email !== item?.key)
+                    .concat(checked ? [] : (item?.key as string));
+                  e.stopPropagation();
+                }
+                  ">
                   <template #checkedChildren>
                     <span class="text-[8px] leading-none">BCC</span>
                   </template>
@@ -261,18 +215,10 @@ const { proceed, loading } = useLoading(
           </a-transfer>
         </a-spin>
       </a-form-item>
-      <a-form-item
-        label="Subject"
-        :label-col="{ xl: { span: 4 }, xxl: { span: 3 } }"
-        :colon="false"
-      >
+      <a-form-item label="Subject" :label-col="{ xl: { span: 4 }, xxl: { span: 3 } }" :colon="false">
         <a-input v-model:value="subject" />
       </a-form-item>
-      <a-form-item
-        label="Body"
-        :label-col="{ xl: { span: 4 }, xxl: { span: 3 } }"
-        :colon="false"
-      >
+      <a-form-item label="Body" :label-col="{ xl: { span: 4 }, xxl: { span: 3 } }" :colon="false">
         <RichTextEditor v-model="body" @click="console.log(body)" />
       </a-form-item>
     </div>

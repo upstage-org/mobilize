@@ -42,7 +42,7 @@ const toSrc = ({ file }: { file: File }) => {
 const handleUpload = async (file: UploadFile) => {
   let fileType = file.file.type;
   const profile = (await (load as any)()) || (await refetch());
-  const uploadLimit = profile?.data.whoami.uploadLimit ?? uploadDefault;
+  const uploadLimit = (profile?.data || profile?.whoami).uploadLimit ?? uploadDefault;
 
   if (!fileType.includes("video")) {
     const canUpload = file.file.size <= uploadLimit;
@@ -76,19 +76,9 @@ const uploadFile = async (file: any) => {
 </script>
 
 <template>
-  <a-modal
-    :footer="null"
-    :visible="visible"
-    @cancel="visible = false"
-    width="100%"
-    wrapClassName="fullscreen-dragzone"
-    class="h-full top-0 p-0"
-  >
-    <a-upload-dragger
-      :show-upload-list="false"
-      :custom-request="uploadFile"
-      multiple
-    >
+  <a-modal :footer="null" :visible="visible" @cancel="visible = false" width="100%" wrapClassName="fullscreen-dragzone"
+    class="h-full top-0 p-0">
+    <a-upload-dragger :show-upload-list="false" :custom-request="uploadFile" multiple>
       <p class="ant-upload-drag-icon">
         <UploadOutlined />
       </p>

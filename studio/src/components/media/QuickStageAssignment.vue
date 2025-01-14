@@ -21,16 +21,14 @@ const { result, loading } = useQuery<StudioGraph>(
       whoami {
         username
       }
-      stages {
+      stages(input:{})  {
         edges {
-          node {
-            dbId
-            name
-            createdOn
-            owner {
-              username
-              displayName
-            }
+          id
+          name
+          createdOn
+          owner {
+            username
+            displayName
           }
         }
       }

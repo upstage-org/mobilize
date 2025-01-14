@@ -35,15 +35,15 @@
           class="half-flex" />
         <Field required placeholder="URL" v-model="form.fileLocation" requiredMessage="URL is required" expanded
           @keyup="urlValid = null" @input="checkURL" :right="validatingURL
-        ? 'fas fa-circle-notch fa-spin'
-        : urlValid === true
-          ? 'fas fa-check'
-          : urlValid === false
-            ? 'fas fa-times'
-            : 'fas'
-        " :help="!form.fileLocation &&
-        `URL must be unique and can't be changed! Please avoid typos, unnecessarily long urls, spaces and punctuation inside URL.`
-        " :error="urlError" :disabled="!!stage.id" class="half-flex" maxlength="20" />
+            ? 'fas fa-circle-notch fa-spin'
+            : urlValid === true
+              ? 'fas fa-check'
+              : urlValid === false
+                ? 'fas fa-times'
+                : 'fas'
+            " :help="!form.fileLocation &&
+          `URL must be unique and can't be changed! Please avoid typos, unnecessarily long urls, spaces and punctuation inside URL.`
+          " :error="urlError" :disabled="!!stage.id" class="half-flex" maxlength="20" />
       </div>
     </div>
 
@@ -108,10 +108,10 @@
       </div>
       <div class="field-body" style="flex-wrap: wrap">
         <MultiTransferAccessColumn :columns="[
-        'Audience access only',
-        'Player access',
-        'Player and edit access',
-      ]" :data="users" :owner="owner" :renderLabel="displayName" :renderValue="(item) => item.dbId" :renderKeywords="(item) =>
+          'Audience access only',
+          'Player access',
+          'Player and edit access',
+        ]" :data="users" :owner="owner" :renderLabel="displayName" :renderValue="(item) => item.dbId" :renderKeywords="(item) =>
         `${item.firstName} ${item.lastName} ${item.username} ${item.email} ${item.displayName}`
         " v-model="playerAccess" />
       </div>
@@ -148,8 +148,8 @@ import DuplicateStage from "components/stage/DuplicateStage.vue";
 import DeleteStage from "components/stage/DeleteStage.vue";
 import { useStore } from "vuex";
 import Switch from "components/form/Switch.vue";
-import { useUpdateProfile } from "state/auth";
 import { message } from "ant-design-vue";
+import { handleError } from 'utils/common';
 
 export default {
   components: {
@@ -163,8 +163,8 @@ export default {
     Switch,
   },
   setup: () => {
-    const { whoami } = useUpdateProfile();
     const store = useStore();
+    const whoami = computed(() => store.getters["user/whoami"]);
     const router = useRouter();
     const stage = inject("stage");
     const clearCache = inject("clearCache");
@@ -234,7 +234,7 @@ export default {
         console.log(clearCache);
         clearCache();
       } catch (error) {
-        message.error(error);
+        handleError(error);
       }
     };
 

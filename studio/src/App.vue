@@ -1,14 +1,10 @@
 <script setup lang="ts">
-import { apolloClient } from "apollo";
-import { provide, onMounted } from "vue";
-import { DefaultApolloClient } from "@vue/apollo-composable";
+import { onMounted } from "vue";
 import "styles/bulma.css";
 import "styles/bulma_slider.css";
 import "styles/custom.less";
 import { useStore } from "vuex";
 
-
-provide(DefaultApolloClient, apolloClient);
 
 const store = useStore();
 store.dispatch("user/fetchCurrent");

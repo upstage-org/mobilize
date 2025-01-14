@@ -86,7 +86,7 @@ export default {
       stage: null,
     });
 
-    const { nodes: typesData } = useQuery(stageGraph.assetTypeList);
+    const { nodes: typesData } = useQuery(stageGraph.mediaTypeList);
     const types = computed(() => {
       const list = [];
       list.push({ id: null, name: "All Types" });
@@ -127,9 +127,9 @@ export default {
           media.name.toLowerCase().includes(filter.name.toLowerCase()),
         );
       }
-      if (filter.mediaType && filter.mediaType.id) {
+      if (filter.assetType && filter.assetType.id) {
         list = list.filter(
-          (media) => media.assetType.name === filter.mediaType.name,
+          (media) => media.assetType.name === filter.assetType.name,
         );
       }
       if (filter.owner && filter.owner.id) {

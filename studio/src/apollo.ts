@@ -14,11 +14,11 @@ import { getSharedAuth, setSharedAuth } from "utils/common";
 import gql from "graphql-tag";
 import { Media } from "models/studio";
 import { provideApolloClient } from "@vue/apollo-composable";
-
+import { logout } from "utils/auth";
 // HTTP connection to the API
 const httpLink = createHttpLink({
   // You should use an absolute URL here
-  uri: `${configs.GRAPHQL_ENDPOINT}studio_graphql/`,
+  uri: `${configs.GRAPHQL_ENDPOINT}studio_graphql`,
 });
 
 let refreshing = false;
@@ -37,10 +37,11 @@ const errorLink = onError(
               apolloClient
                 .mutate({
                   mutation: gql`
-                    mutation refreshUser($refreshToken: String) {
-                      refreshUser(refreshToken: $refreshToken) {
-                        newToken
-                      }
+                    mutation {
+                        refreshToken {
+                            access_token
+                            refresh_token
+                        }
                     }
                   `,
                   context: {
@@ -53,6 +54,7 @@ const errorLink = onError(
                   },
                 })
                 .catch(() => {
+                  logout();
                   // Handle token refresh errors e.g clear stored tokens, redirect to login
                   message.error(
                     `Token expired, could not refresh your access token. Please login again!`,
@@ -60,7 +62,7 @@ const errorLink = onError(
                   return;
                 }),
             )
-              .map((value) => value?.data.refreshUser.newToken)
+              .map((value) => value?.data.refreshToken.access_token)
               .filter((value) => Boolean(value))
               .flatMap((accessToken) => {
                 refreshing = false;
@@ -73,7 +75,7 @@ const errorLink = onError(
                 operation.setContext({
                   headers: {
                     ...operation.getContext().headers,
-                    "X-Access-Token": accessToken,
+                    "Authorization": `Bearer ${accessToken}`,
                   },
                 });
                 return forward(operation);
@@ -94,7 +96,7 @@ const errorLink = onError(
               operation.setContext({
                 headers: {
                   ...operation.getContext().headers,
-                  "X-Access-Token": accessToken,
+                  "Authorization": `Bearer ${accessToken}`,
                 },
               });
               return forward(operation);
@@ -113,7 +115,7 @@ const authLink = setContext((request, { headers }) => {
   // return the headers to the context so httpLink can read them
   return {
     headers: {
-      "X-Access-Token": auth?.token,
+      "Authorization": `Bearer ${auth?.token}`,
       ...headers,
     },
   };

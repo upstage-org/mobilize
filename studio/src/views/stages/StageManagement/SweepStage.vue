@@ -12,10 +12,11 @@
 <script>
 import { inject, ref, createVNode } from "vue";
 import { message } from "ant-design-vue";
-import { useMutation } from "services/graphql/composable";
 import { stageGraph } from "services/graphql";
 import { useClearStage } from "components/stage/composable";
 import { Modal } from "ant-design-vue";
+import { handleError } from 'utils/common';
+import { useMutation } from "services/graphql/composable";
 
 export default {
   props: {
@@ -25,6 +26,7 @@ export default {
     const stage = inject("stage");
     const refresh = inject("refresh");
     const status = ref();
+
     const { mutation } = useMutation(stageGraph.sweepStage, {
       id: stage.value.id,
     });
@@ -59,7 +61,7 @@ export default {
           refresh(stage.value.id);
         }
       } catch (error) {
-        message.warning(error);
+        handleError(error);
       } finally {
         status.value = "";
       }

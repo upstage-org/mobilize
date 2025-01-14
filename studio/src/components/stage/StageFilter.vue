@@ -18,40 +18,30 @@ const { result, loading } = useQuery<StudioGraph>(gql`
       roleName
     }
     users(active: true) {
-      edges {
-        node {
-          dbId
-          displayName
-          username
-        }
-      }
+      id
+      username
+      displayName
     }
-    stages {
+    stages(input:{}) {
       edges {
-        node {
-          dbId
-          name
-          createdOn
-          owner {
-            username
-            displayName
-          }
+        id
+        name
+        createdOn
+        owner {
+          username
+          displayName
         }
       }
     }
     tags {
-      edges {
-        node {
-          name
-        }
-      }
+      id
+      name
+      color
+      createdOn
     }
     mediaTypes {
-      edges {
-        node {
-          name
-        }
-      }
+      id
+      name
     }
   }
 `);
@@ -171,9 +161,9 @@ const VNodes = (_: any, { attrs }: { attrs: any }) => {
           v-model:value="owners"
           :options="
             result
-              ? result.users.edges.map((e) => ({
-                  value: e.node.username,
-                  label: e.node.displayName || e.node.username,
+              ? result.users.map((e) => ({
+                  value: e.username,
+                  label: e.displayName || e.username,
                 }))
               : []
           "

@@ -39,7 +39,7 @@ export default {
           const { width } = el.getBoundingClientRect();
           const canvas = await html2canvas(el, { scale: 200 / width });
           const preview = cropImageFromCanvas(canvas)?.src;
-          const stageId = store.state.stage.model.dbId;
+          const stageId = store.state.stage.model.id;
           const { name } = form;
           const { save } = useMutation(stageGraph.saveScene);
           await save("Scene saved successfully!", {

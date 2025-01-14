@@ -1,35 +1,25 @@
 // @ts-nocheck
 import { gql } from "graphql-request";
-import { stageGraph } from ".";
-import { createClient } from "./graphql";
-
-const client = createClient("stage_graphql");
+import { stageGraph, studioClient } from ".";
+import { studioClient } from '../graphql';
 
 export const stageFragment = gql`
   fragment stageFragment on Stage {
     id
     name
     fileLocation
+    status
+    visibility
+    cover
     description
+    playerAccess
     permission
+    lastAccess
     owner {
       id
       username
       displayName
     }
-    attributes {
-      id
-      name
-      description
-    }
-    media {
-      id
-      name
-      type
-      src
-      description
-    }
-    dbId
   }
 `;
 
@@ -37,6 +27,9 @@ export const assetFragment = gql`
   fragment assetFragment on Asset {
     id
     name
+    src
+    sign
+    createdOn
     size
     description
     assetType {
@@ -48,13 +41,18 @@ export const assetFragment = gql`
       username
       displayName
     }
-    createdOn
-    src
-    dbId
     copyrightLevel
-    playerAccess
-    permission
-    sign
+    permissions {
+      id
+      userId
+      assetId
+      approved
+      seen
+      note
+      user {
+        username
+      }
+    }
   }
 `;
 
@@ -62,14 +60,13 @@ export const sceneFragment = gql`
   fragment sceneFragment on Scene {
     id
     name
-    payload
-    scenePreview
+    
   }
 `;
 
 export default {
   createStage: async (variables) => {
-    let result = await client.request(
+    let result = await studioClient.request(
       gql`
         mutation CreateStage($name: String, $fileLocation: String) {
           createStage(input: { name: $name, fileLocation: $fileLocation }) {
@@ -88,7 +85,7 @@ export default {
     }
   },
   updateStage: (variables) =>
-    client.request(
+    studioClient.request(
       gql`
         mutation UpdateStage(
           $id: ID!
@@ -112,9 +109,7 @@ export default {
               playerAccess: $playerAccess
             }
           ) {
-            stage {
-              ...stageFragment
-            }
+            ...stageFragment
           }
         }
         ${stageFragment}
@@ -122,23 +117,23 @@ export default {
       variables,
     ),
   updateStatus: (stageId) =>
-    client.request(gql`
+    studioClient.request(gql`
   mutation {
-    updateStatus(stageId: "${stageId}" ) {
+    updateStatus(id: "${stageId}" ) {
       result
     }
   }
   `),
   updateVisibility: (stageId) =>
-    client.request(gql`
+    studioClient.request(gql`
   mutation {
-    updateVisibility(stageId: "${stageId}" ) {
+    updateVisibility(id: "${stageId}" ) {
       result
     }
   }
   `),
   updateLastAccess: (stageId) =>
-    client.request(gql`
+    studioClient.request(gql`
   mutation {
     updateLastAccess(stageId: "${stageId}" ) {
       result
@@ -146,128 +141,63 @@ export default {
   }
   `),
   sweepStage: (variables) =>
-    client.request(
+    studioClient.request(
       gql`
         mutation SweepStage($id: ID!) {
-          sweepStage(input: { id: $id }) {
-            success
-            performanceId
+          sweepStage(id: $id) {
+              success
+              performanceId
           }
         }
       `,
       variables,
     ),
   stageList: (variables) =>
-    client.request(
+    studioClient.request(
       gql`
-        query ListStage(
-          $id: ID
-          $nameLike: String
-          $fileLocation: String
-          $createdOn: DateTime
+        query StageTable(
+          $page: Int
+          $limit: Int
         ) {
-          stageList(
-            id: $id
-            nameLike: $nameLike
-            fileLocation: $fileLocation
-            createdOn: $createdOn
-            sort: [CREATED_ON_DESC, ID_DESC]
-          ) {
+          stages(input:{
+            page: $page
+            limit: $limit
+          }) {
             totalCount
             edges {
-              node {
                 ...stageFragment
-                createdOn
-                lastAccess
-                activeRecording {
-                  id
-                  name
-                  createdOn
-                }
-              }
             }
           }
         }
         ${stageFragment}
-      `,
-      variables,
-    ),
-  foyerStageList: (variables) =>
-    client.request(
-      gql`
-        query ListFoyerStage {
-          foyerStageList {
-            totalCount
-            edges {
-              node {
-                id
-                name
-                fileLocation
-                cover
-              }
-            }
-          }
-        }
       `,
       variables,
     ),
   getStage: (id) =>
-    client.request(
+    studioClient.request(
       gql`
-        query ListStage($id: ID) {
-          stageList(id: $id) {
-            edges {
-              node {
-                ...stageFragment
-                chats {
-                  payload
-                  performanceId
-                }
-                performances {
-                  id
-                  createdOn
-                  name
-                  description
-                  recording
-                }
-                scenes {
-                  id
-                  name
-                  scenePreview
-                  createdOn
-                  owner {
-                    id
-                    username
-                    displayName
-                  }
-                }
-              }
+          query stage($id: ID!) {
+            stage(id: $id) {
+              ...stageFragment
             }
           }
-        }
-        ${stageFragment}
-      `,
+          ${stageFragment}
+        `,
       { id },
     ),
   loadStage: (fileLocation, performanceId) =>
-    client
+    studioClient
       .request(
         gql`
-          query ListStage($fileLocation: String, $performanceId: Int) {
-            stageList(fileLocation: $fileLocation) {
-              edges {
-                node {
-                  ...stageFragment
-                  events(performanceId: $performanceId) {
-                    id
-                    topic
-                    payload
-                    mqttTimestamp
-                  }
-                  scenes(performanceId: $performanceId) {
-                    ...sceneFragment
-                  }
-                }
+          query ListStage($fileLocation: String, $performanceId: ID) {
+            stageList(input: {
+              fileLocation: $fileLocation
+              performanceId: $performanceId
+            }) {
+              ...stageFragment
+              permission
+              scenes {
+                ...sceneFragment
               }
             }
           }
@@ -278,7 +208,7 @@ export default {
       )
       .then((response) => {
         return {
-          stage: response.stageList.edges[0]?.node,
+          stage: response.stageList[0]
         };
       }),
   loadPermission: (fileLocation) =>
@@ -341,7 +271,7 @@ export default {
       )
       .then((response) => response.stageList.edges[0]?.node?.events),
   uploadMedia: (variables) =>
-    client.request(
+    studioClient.request(
       gql`
         mutation uploadMedia(
           $name: String!
@@ -365,24 +295,18 @@ export default {
       variables,
     ),
   mediaList: (variables) =>
-    client.request(
+    studioClient.request(
       gql`
-        query AssetList($id: ID, $nameLike: String, $assetType: String) {
-          assetList(
-            id: $id
-            nameLike: $nameLike
-            assetType: $assetType
-            sort: ID_DESC
+        query MediaList($nameLike: String, $mediaType: String) {
+          mediaList(
+            owner: $nameLike
+            mediaType: $mediaType
           ) {
-            edges {
-              node {
-                ...assetFragment
-                stages {
-                  id
-                  name
-                  url
-                }
-              }
+            ...assetFragment
+            stages {
+              id
+              name
+              fileLocation
             }
           }
         }
@@ -390,25 +314,20 @@ export default {
       `,
       variables,
     ),
-  assetTypeList: (variables) =>
-    client.request(
+  mediaTypeList: (variables) =>
+    studioClient.request(
       gql`
-        query AssetTypeList($id: ID, $nameLike: String) {
-          assetTypeList(id: $id, nameLike: $nameLike) {
-            edges {
-              node {
-                id
-                dbId
-                name
-              }
-            }
+        query MediaTypeList {
+          mediaTypes {
+            id
+            name
           }
         }
       `,
       variables,
     ),
   saveStageMedia: (id, mediaIds) =>
-    client.request(
+    studioClient.request(
       gql`
         mutation SaveStageMedia($id: ID!, $mediaIds: [Int]) {
           assignMedia(input: { id: $id, mediaIds: $mediaIds }) {
@@ -422,7 +341,7 @@ export default {
       { id, mediaIds },
     ),
   assignStages: (id, stageIds) =>
-    client.request(
+    studioClient.request(
       gql`
         mutation AssignStages($id: ID!, $stageIds: [Int]) {
           assignStages(input: { id: $id, stageIds: $stageIds }) {
@@ -435,7 +354,7 @@ export default {
       { id, stageIds },
     ),
   saveStageConfig: (id, config) =>
-    client.request(
+    studioClient.request(
       gql`
         mutation UpdateStage($id: ID!, $config: String) {
           updateStage(input: { id: $id, config: $config }) {
@@ -449,55 +368,31 @@ export default {
       { id, config },
     ),
   assignableMedia: () =>
-    client.request(gql`
+    studioClient.request(gql`
       query AssignableMedia {
-        avatars: assetList(assetType: "avatar") {
-          edges {
-            node {
-              ...assetFragment
-            }
-          }
+        avatars: mediaList(mediaType: "avatar") {
+          ...assetFragment
         }
-        props: assetList(assetType: "prop") {
-          edges {
-            node {
-              ...assetFragment
-            }
-          }
+        props: mediaList(mediaType: "prop") {
+          ...assetFragment
         }
-        backdrops: assetList(assetType: "backdrop") {
-          edges {
-            node {
-              ...assetFragment
-            }
-          }
+        backdrops: mediaList(mediaType: "backdrop") {
+          ...assetFragment
         }
-        audios: assetList(assetType: "audio") {
-          edges {
-            node {
-              ...assetFragment
-            }
-          }
+        audios: mediaList(mediaType: "audio") {
+          ...assetFragment
         }
-        streams: assetList(assetType: "stream") {
-          edges {
-            node {
-              ...assetFragment
-            }
-          }
+        streams: mediaList(mediaType: "stream") {
+          ...assetFragment
         }
-        curtains: assetList(assetType: "curtain") {
-          edges {
-            node {
-              ...assetFragment
-            }
-          }
+        curtains: mediaList(mediaType: "curtain") {
+          ...assetFragment
         }
       }
       ${assetFragment}
     `),
   updateMedia: (variables) =>
-    client.request(
+    studioClient.request(
       gql`
         mutation updateMedia(
           $id: ID
@@ -530,7 +425,7 @@ export default {
       variables,
     ),
   deleteMedia: (id) =>
-    client.request(
+    studioClient.request(
       gql`
         mutation deleteMedia($id: ID!) {
           deleteMedia(id: $id) {
@@ -542,7 +437,7 @@ export default {
       { id },
     ),
   deleteStage: (id) =>
-    client.request(
+    studioClient.request(
       gql`
         mutation deleteStage($id: ID!) {
           deleteStage(id: $id) {
@@ -553,20 +448,20 @@ export default {
       { id },
     ),
   saveScene: (variables) =>
-    client.request(
+    studioClient.request(
       gql`
         mutation SaveScene(
-          $stageId: Int!
+          $stageId: ID
           $payload: String
           $preview: String
           $name: String
         ) {
-          saveScene(
+          saveScene(input:{
             stageId: $stageId
             payload: $payload
             preview: $preview
             name: $name
-          ) {
+        }) {
             id
           }
         }
@@ -574,9 +469,9 @@ export default {
       variables,
     ),
   deleteScene: (id) =>
-    client.request(
+    studioClient.request(
       gql`
-        mutation DeleteScene($id: Int!) {
+        mutation DeleteScene($id: ID!) {
           deleteScene(id: $id) {
             success
             message
@@ -586,19 +481,20 @@ export default {
       { id },
     ),
   duplicateStage: ({ id, name }) =>
-    client.request(
+    studioClient.request(
       gql`
         mutation duplicateStage($id: ID!, $name: String!) {
           duplicateStage(id: $id, name: $name) {
-            success
-            newStageId
+            id
+            name
+            description
           }
         }
       `,
       { id, name },
     ),
   deletePerformance: (id) =>
-    client.request(
+    studioClient.request(
       gql`
         mutation DeletePerformance($id: Int!) {
           deletePerformance(id: $id) {
@@ -609,7 +505,7 @@ export default {
       { id },
     ),
   updatePerformance: (id, name, description) =>
-    client.request(
+    studioClient.request(
       gql`
         mutation updatePerformance(
           $id: Int!
@@ -624,7 +520,7 @@ export default {
       { id, name, description },
     ),
   startRecording: (stageId, name, description) =>
-    client.request(
+    studioClient.request(
       gql`
         mutation startRecording(
           $stageId: ID!
@@ -645,7 +541,7 @@ export default {
       { stageId, name, description },
     ),
   saveRecording: (id) =>
-    client.request(
+    studioClient.request(
       gql`
         mutation saveRecording($id: Int!) {
           saveRecording(id: $id) {

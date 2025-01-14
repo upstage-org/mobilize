@@ -2,7 +2,7 @@
 import configs from "config";
 import { SharedAuth, SharedConfigs } from "models/config";
 import { User as LegacyUser } from "models/studio";
-import { User } from "genql/studio";
+import { message } from "ant-design-vue";
 
 export function absolutePath(path: string) {
   return `${configs.STATIC_ASSETS_ENDPOINT}${path}`;
@@ -65,7 +65,7 @@ export function titleCase(str: string) {
 
 export function displayName(
   user: Pick<
-    User | LegacyUser,
+    any | LegacyUser,
     "displayName" | "firstName" | "lastName" | "username"
   >,
 ) {
@@ -224,4 +224,13 @@ export function throttle(callback, limit) {
       }, limit);
     }
   };
+}
+
+export function handleError(e) {
+  console.log("====e", e)
+  if (e & e.response?.errors && e.response?.errors[0] && e.response?.errors[0].message) {
+    message.error(e.response?.errors[0].message)
+  } else {
+    message.error(typeof e == "string" ? e : "Error!")
+  }
 }

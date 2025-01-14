@@ -68,7 +68,6 @@ import { includesIgnoreCase, displayName } from "utils/common";
 import { useStore } from "vuex";
 import MultiframePreview from "./MultiframePreview.vue";
 import Reorder from "./Reorder.vue";
-import { useUpdateProfile } from "state/auth";
 
 export default {
   components: {
@@ -83,7 +82,8 @@ export default {
   },
   setup: () => {
     const store = useStore();
-    const { whoami } = useUpdateProfile();
+    const whoami = computed(() => store.getters["user/whoami"]);
+  
     const stage = inject("stage");
     const clearCache = inject("clearCache");
 
@@ -99,21 +99,21 @@ export default {
         data.value;
       const mediaList = []
         .concat(
-          avatars.edges,
-          props.edges,
-          backdrops.edges,
-          audios.edges,
-          streams.edges,
-          curtains.edges,
+          avatars,
+          props,
+          backdrops,
+          audios,
+          streams,
+          curtains,
         )
-        .map((edge) => edge.node);
+        .map((edge) => edge);
       return mediaList;
     });
 
     const mapData = () => {
       if (!stage.value || !mediaList.value) return;
       selectedMedia.value = (stage.value.media || []).map((m) =>
-        mediaList.value.find((media) => media.dbId === m.id),
+        mediaList.value.find((media) => media.id === m.id),
       );
       if (selectedMedia.value[0]) {
         totalSize.value = selectedMedia?.value.reduce(

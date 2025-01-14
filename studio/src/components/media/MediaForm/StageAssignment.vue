@@ -14,15 +14,13 @@ const props = defineProps({
 
 const emits = defineEmits(["update:modelValue"]);
 
-const { result, loading } = useQuery<StudioGraph>(
+const { result, loading } = useQuery(
   gql`
     {
-      stages {
+      stages(input:{}) {
         edges {
-          node {
-            dbId
-            name
-          }
+          id
+          name
         }
       }
     }
@@ -33,8 +31,7 @@ const { result, loading } = useQuery<StudioGraph>(
 const stages = computed(() => {
   if (result.value?.stages) {
     return result.value.stages.edges
-      .map(({ node }) => node)
-      .map(({ dbId, name }) => ({ key: dbId, name }));
+      .map(({ id, name }: any) => ({ key: id, name }));
   }
   return [];
 });
@@ -56,22 +53,14 @@ const renderItem = (item: TransferItem) => item.name;
 </script>
 
 <template>
-  <a-transfer
-    :locale="{
-      itemUnit: 'stage',
-      itemsUnit: 'stages',
-      notFoundContent: 'No stage available',
-      searchPlaceholder: 'Search stage name',
-    }"
-    :list-style="{
+  <a-transfer :locale="{
+    itemUnit: 'stage',
+    itemsUnit: 'stages',
+    notFoundContent: 'No stage available',
+    searchPlaceholder: 'Search stage name',
+  }" :list-style="{
       flex: '1',
       height: '300px',
-    }"
-    :titles="[' available', ' assigned']"
-    v-model:target-keys="targetKeys"
-    :data-source="stages as any"
-    show-search
-    :filter-option="filterOption"
-    :render="renderItem"
-  />
+    }" :titles="[' available', ' assigned']" v-model:target-keys="targetKeys" :data-source="stages as any" show-search
+    :filter-option="filterOption" :render="renderItem" />
 </template>

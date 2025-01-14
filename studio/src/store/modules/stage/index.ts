@@ -1132,7 +1132,7 @@ export default {
       if (stage) {
         commit("SET_MODEL", stage);
         const { events } = stage;
-        if (recordId) {
+        if (recordId && events) {
           commit("SET_REPLAY", {
             timestamp: {
               begin: events[0].mqttTimestamp,
@@ -1141,24 +1141,26 @@ export default {
             },
           });
         } else {
-          events.forEach((event) => dispatch("replayEvent", event));
+          (events || []).forEach((event) => dispatch("replayEvent", event));
         }
       } else {
         commit("SET_PRELOADING_STATUS", false);
       }
     },
     async reloadPermission({ state }) {
-      const permission = await stageGraph.loadPermission(
-        state.model.fileLocation,
-      );
-      if (permission) {
-        state.model.permission = permission;
+      const { stage } = await stageGraph.loadStage(state.model.fileLocation);
+      // const permission = await stageGraph.loadPermission(
+      //   state.model.fileLocation,
+      // );
+      if (stage) {
+        state.model.permission = stage.permission;
       }
     },
     async loadPermission({ state, commit }) {
-      const permission = await stageGraph.loadPermission(
-        state.model.fileLocation,
-      );
+      const permission = state.model.permission;
+      //  await stageGraph.loadPermission(
+      //   state.model.fileLocation,
+      // );
       if (permission == "owner" || permission == "editor") {
         commit("SET_SHOW_CLEAR_CHAT_SETTINGS", true);
         commit("SET_SHOW_DOWNLOAD_CHAT_SETTINGS", true);
@@ -1176,15 +1178,17 @@ export default {
       state.isLoadingScenes = false;
     },
     async reloadMissingEvents({ state, dispatch }) {
-      const lastEventId =
-        state.model.events[state.model.events.length - 1]?.id ?? 0;
-      const events = await stageGraph.loadEvents(
-        state.model.fileLocation,
-        lastEventId,
-      );
-      if (events) {
-        events.forEach((event) => dispatch("replicateEvent", event));
-        state.model.events = state.model.events.concat(events);
+      if (state.model.events) {
+        const lastEventId =
+          state.model.events[state.model.events.length - 1]?.id ?? 0;
+        const events = await stageGraph.loadEvents(
+          state.model.fileLocation,
+          lastEventId,
+        );
+        if (events) {
+          events.forEach((event) => dispatch("replicateEvent", event));
+          state.model.events = state.model.events.concat(events);
+        }
       }
     },
     replaceScene({ state, commit, dispatch }, sceneId) {

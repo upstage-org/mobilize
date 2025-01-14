@@ -1,13 +1,12 @@
 // @ts-nocheck
 import { gql } from "graphql-request";
 import { createClient } from "./graphql";
-
-const client = createClient("user_graphql");
+import { studioClient } from './';
+import _ from 'lodash';
 
 export const userFragment = gql`
   fragment userFragment on User {
     id
-    dbId
     username
     firstName
     lastName
@@ -22,8 +21,67 @@ export const userFragment = gql`
 `;
 
 export default {
+  login: (variables) =>
+    studioClient.request(
+      gql`
+        mutation login(
+          $username: String!
+          $password: String!
+        ) {
+          login(payload: {
+              username: $username
+              password: $password
+          }) {
+              user_id
+              access_token
+              refresh_token
+              role
+              first_name
+              groups {
+                  id
+                  name
+              }
+              username
+              title
+          }
+        }
+      `,
+      variables,
+    ),
+  refreshUser: (variables, headers) =>
+    studioClient.request(
+      gql`
+          mutation {
+              refreshToken {
+                  access_token
+                  refresh_token
+              }
+          }
+        `,
+      variables,
+      headers,
+    ),
+  currentUser: () =>
+    studioClient.request(gql`
+        query {
+            currentUser {
+                id
+                username
+                firstName
+                lastName
+                displayName
+                email
+                active
+                createdOn
+                role
+                uploadLimit
+                intro
+            }
+        }
+      `),
+
   createUser: (variables) =>
-    client.request(
+    studioClient.request(
       gql`
         mutation CreateUser(
           $username: String!
@@ -55,10 +113,11 @@ export default {
       variables,
     ),
   updateUser: (variables) =>
-    client.request(
+    studioClient.request(
       gql`
         mutation UpdateUser(
           $id: ID!
+          $username: String!
           $displayName: String
           $firstName: String
           $lastName: String
@@ -67,10 +126,13 @@ export default {
           $active: Boolean
           $role: Int
           $uploadLimit: Int
+          $intro: String
+          $binName: String
         ) {
           updateUser(
-            inbound: {
+            input: {
               id: $id
+              username: $username
               displayName: $displayName
               firstName: $firstName
               lastName: $lastName
@@ -79,59 +141,34 @@ export default {
               active: $active
               role: $role
               uploadLimit: $uploadLimit
+              intro: $intro
+              binName: $binName
             }
           ) {
-            user {
-              ...userFragment
-            }
+            ...userFragment
           }
         }
         ${userFragment}
       `,
-      variables,
+      {
+        ..._.omitBy(variables, _.isNil),
+        ...variables.role ? { role: parseInt(variables.role) } : {},
+        binName: ""
+      },
     ),
-  refreshUser: (variables, headers) =>
-    client.request(
-      gql`
-        mutation RefreshToken($refreshToken: String) {
-          refreshUser(refreshToken: $refreshToken) {
-            newToken
-          }
-        }
-      `,
-      variables,
-      headers,
-    ),
-  currentUser: () =>
-    client.request(gql`
-      query {
-        currentUser {
-          ...userFragment
-        }
-      }
-      ${userFragment}
-    `),
+
   userList: () =>
-    client.request(gql`
-      query UserList($first: Int, $after: String) {
-        userList(
-          sort: USERNAME_ASC
-          active: true
-          first: $first
-          after: $after
-        ) {
-          totalCount
-          edges {
-            node {
-              ...userFragment
-            }
-          }
+    studioClient.request(gql`
+      query UserList {
+        users(active: true) {
+            ...userFragment
         }
       }
       ${userFragment}
     `),
+
   changePassword: (variables) =>
-    client.request(
+    studioClient.request(
       gql`
         mutation ChangePassword(
           $id: ID!
@@ -139,59 +176,32 @@ export default {
           $newPassword: String!
         ) {
           changePassword(
-            inbound: {
+            input: {
               id: $id
               oldPassword: $oldPassword
               newPassword: $newPassword
             }
           ) {
             success
-          }
-        }
-      `,
-      variables,
-    ),
-  deleteUser: (variables) =>
-    client.request(
-      gql`
-        mutation DeleteUser($id: ID!) {
-          deleteUser(inbound: { id: $id }) {
-            success
-          }
-        }
-      `,
-      variables,
-    ),
-  batchUserCreation: (variables) =>
-    client.request(
-      gql`
-        mutation BatchUserCreation(
-          $users: [BatchUserInput]!
-          $stageIds: [Int]
-        ) {
-          batchUserCreation(users: $users, stageIds: $stageIds) {
-            users {
-              dbId
-            }
+            message
           }
         }
       `,
       variables,
     ),
   requestPasswordReset: (variables) =>
-    client.request(
+    studioClient.request(
       gql`
-        mutation RequestPasswordReset($usernameOrEmail: String) {
-          requestPasswordReset(usernameOrEmail: $usernameOrEmail) {
+        mutation RequestPasswordReset($usernameOrEmail: String!) {
+          requestPasswordReset(email: $usernameOrEmail) {
             message
-            username
           }
         }
       `,
       variables,
     ),
   verifyPasswordReset: (variables) =>
-    client.request(
+    studioClient.request(
       gql`
         mutation verifyPasswordReset($username: String, $otp: String) {
           verifyPasswordReset(username: $username, otp: $otp) {
@@ -202,7 +212,7 @@ export default {
       variables,
     ),
   passwordReset: (variables) =>
-    client.request(
+    studioClient.request(
       gql`
         mutation PasswordReset(
           $username: String
@@ -216,4 +226,20 @@ export default {
       `,
       variables,
     ),
+  adminPlayers: () =>
+    studioClient.request(gql`
+        query adminPlayers {
+          adminPlayers {
+              edges {
+                id
+                username
+                email
+                role
+                firstName
+                lastName
+                displayName
+              }
+          }
+        }
+      `),
 };

@@ -2,7 +2,7 @@
   <div class="locale-changer m-3">
     <a-select
       v-model:value="$i18n.locale"
-      @update:value="persistLocale"
+      @update="persistLocale"
       class="w-full"
     >
       <a-select-option

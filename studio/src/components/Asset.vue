@@ -22,8 +22,8 @@ export default {
   emits: ["detectSize"],
   components: { LarixQRCode },
   setup: (props, { emit }) => {
-    if (props.asset.assetType) {
-      Object.assign(props.asset, { mediaType: props.asset.assetType.name });
+    if (props.asset.mediaType) {
+      Object.assign(props.asset, { mediaType: props.asset.mediaType.name });
     }
     const src = computed(
       () => props.asset.base64 ?? absolutePath(props.asset.src),

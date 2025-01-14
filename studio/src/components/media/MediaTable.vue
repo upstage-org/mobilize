@@ -31,15 +31,20 @@ import { ColumnType, TablePaginationConfig } from "ant-design-vue/lib/table";
 import { SorterResult } from "ant-design-vue/lib/table/interface";
 import QuickStageAssignment from "./QuickStageAssignment.vue";
 import { useI18n } from "vue-i18n";
-import { useWhoAmI } from "state/auth";
+import { useStore } from "vuex";
+
+const store = useStore();
+const whoami = computed(() => store.getters["user/whoami"]);
+const isAdmin = computed(() => store.getters["user/isAdmin"]);
 
 const { t } = useI18n();
 const files = inject<Ref<UploadFile[]>>("files");
 
 const tableParams = reactive({
+  page: 1,
   limit: 10,
   cursor: undefined,
-  sort: "CREATED_ON_DESC",
+  //sort: "CREATED_ON_DESC",
 });
 const { result: inquiryResult } = useQuery(gql`
   {
@@ -50,73 +55,51 @@ const params = computed(() => ({
   ...tableParams,
   ...inquiryResult.value.inquiry,
 }));
-watch(inquiryResult, () => {
-  tableParams.cursor = undefined;
-});
-
 const { result, loading, fetchMore, refetch } = useQuery<
   StudioGraph,
-  { cursor?: string; limit: number; sort?: string[] }
+  { page: number; limit: number; sort?: string[] }
 >(
   gql`
     query MediaTable(
-      $cursor: String
+      $page: Int
       $limit: Int
-      $sort: [AssetSortEnum]
-      $name: String
-      $mediaTypes: [String]
-      $owners: [String]
-      $stages: [Int]
-      $tags: [String]
-      $createdBetween: [Date]
     ) {
-      media(
-        after: $cursor
-        first: $limit
-        sort: $sort
-        nameLike: $name
-        mediaTypes: $mediaTypes
-        owners: $owners
-        stages: $stages
-        tags: $tags
-        createdBetween: $createdBetween
-      ) {
+      media(input:{
+        page: $page
+        limit: $limit
+      }) {
         totalCount
         edges {
-          cursor
-          node {
-            id
+          id
+          name
+          createdOn
+          size
+          description
+          fileLocation
+          assetType {
             name
-            src
-            sign
-            createdOn
-            size
-            description
-            assetType {
-              name
-            }
-            owner {
-              username
-              displayName
-            }
-            stages {
-              name
-              url
-              id
-            }
-            tags
-            copyrightLevel
-            permissions {
-              ...permissionFragment
-            }
-            privilege
           }
+          permissions {
+            ...permissionFragment
+          }
+          copyrightLevel
+          tags
+          owner {
+            username
+            displayName
+          }
+          stages {
+            name
+            fileLocation
+            id
+          }
+          privilege
         }
       }
     }
     ${permissionFragment}
   `,
-  params.value,
+  tableParams,
   { notifyOnNetworkStatusChange: true },
 );
 
@@ -129,10 +112,7 @@ onMounted(() => {
 });
 
 watch(params, () => {
-  fetchMore({
-    variables: params.value,
-    updateQuery,
-  });
+  refetch();
 });
 
 const columns: ComputedRef<ColumnType<Media>[]> = computed((): ColumnType<Media>[] => [
@@ -246,7 +226,7 @@ const handleTableChange = (
   });
 };
 const dataSource = computed(() =>
-  result.value ? result.value.media.edges.map((edge) => edge.node) : [],
+  result.value ? result.value.media.edges : [],
 );
 
 const {
@@ -269,14 +249,14 @@ onDone((result) => {
     message.error(result.data.deleteMedia.message);
   }
   fetchMore({
-    variables: params.value,
+    variables: tableParams,
     updateQuery,
   });
 });
 
 provide("refresh", () => {
   fetchMore({
-    variables: params.value,
+    variables: tableParams,
     updateQuery,
   });
 });
@@ -316,7 +296,7 @@ const filterTag = (tag: string) => {
   });
 };
 
-const { whoami, isAdmin } = useWhoAmI();
+
 </script>
 
 <template>
@@ -330,7 +310,7 @@ const { whoami, isAdmin } = useWhoAmI();
       ">
       <template #bodyCell="{ column, record, text }">
         <template v-if="column.key === 'preview'">
-          <MediaPreview :media="record as Media" />
+          <MediaPreview v-if="record.assetType" :media="record as Media" />
         </template>
         <template v-if="column.key === 'asset_type_id'">
           <span class="capitalize">{{ text }}</span>

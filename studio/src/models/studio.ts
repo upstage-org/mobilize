@@ -12,10 +12,10 @@ export interface Edge<T> {
 }
 
 export interface StudioGraph {
-  mediaTypes: Connection<MediaType>;
-  users: Connection<User>;
-  stages: Connection<Stage>;
-  tags: Connection<Tag>;
+  mediaTypes: MediaType[];
+  users: User[];
+  stages: Stage[];
+  tags: Tag[];
   media: Connection<Media>;
   whoami: User;
   notifications: Notification[];
@@ -87,7 +87,7 @@ export const uploadDefault = 1024 * 1024;
 export interface Media {
   id: string;
   name: string;
-  src: string;
+  fileLocation: string;
   sign: string;
   description: string;
   createdOn: string;

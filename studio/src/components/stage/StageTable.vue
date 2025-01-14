@@ -17,9 +17,9 @@ const enterStage = (stage: Stage) => {
   window.open(`/${stage.fileLocation}`, "_blank");
 };
 const tableParams = reactive({
+  page: 1,
   limit: 10,
-  cursor: undefined,
-  sort: "CREATED_ON_DESC",
+  //sort: "CREATED_ON_DESC",
 });
 const { result: inquiryResult } = useQuery(gql`
   {
@@ -30,71 +30,55 @@ const params = computed(() => ({
   ...tableParams,
   ...inquiryResult.value.inquiry,
 }));
-watch(inquiryResult, () => {
-  tableParams.cursor = undefined;
-});
 
 const { result, loading, fetchMore, refetch } = useQuery<
   StudioGraph,
-  { cursor?: string; limit: number; sort?: string[] }
+  { page: number; limit: number; sort?: string[] }
 >(
   gql`
     query StageTable(
-      $cursor: String
+      $page: Int
       $limit: Int
-      $sort: [StageSortEnum]
-      $name: String
-      $owners: [String]
-      $createdBetween: [Date]
     ) {
-      stages(
-        after: $cursor
-        first: $limit
-        sort: $sort
-        nameLike: $name
-        owners: $owners
-        createdBetween: $createdBetween
-      ) {
+      stages(input:{
+        page: $page
+        limit: $limit
+      }) {
         totalCount
         edges {
-          cursor
-          node {
             id
             name
-            cover
-            createdOn
-            lastAccess
-            description
-            permission
-            visibility
-            status
             fileLocation
+            status
+            visibility
+            cover
+            description
+            playerAccess
+            permission
+            lastAccess
             owner {
               username
               displayName
             }
-          }
+            assets {
+              id
+              name
+            }
+            createdOn
         }
       }
     }
   `,
-  params.value,
+  tableParams,
   { notifyOnNetworkStatusChange: true },
 );
-
-const updateQuery = (previousResult: StudioGraph, { fetchMoreResult }: any) => {
-  return fetchMoreResult ?? previousResult;
-};
 
 onMounted(() => {
   refetch();
 });
 
 watch(params, () => {
-  fetchMore({
-    variables: params.value,
-    updateQuery,
-  });
+  refetch();
 });
 
 const columns: ComputedRef<ColumnType<Stage>[]> = computed((): ColumnType<Stage>[] => [
@@ -197,40 +181,35 @@ const handleTableChange = (
     .map(({ columnKey, order }) =>
       `${columnKey}_${order === "ascend" ? "ASC" : "DESC"}`.toUpperCase(),
     );
+
   Object.assign(tableParams, {
-    cursor:
-      current > 1
-        ? window.btoa(`arrayconnection:${(current - 1) * pageSize}`)
-        : undefined,
+    page: current,
     limit: pageSize,
     sort,
   });
 };
-const dataSource = computed(() =>
-  result.value ? result.value.stages.edges.map((edge) => edge.node) : [],
-);
+const dataSource = computed(() => {
+  return result.value ? result.value.stages.edges : []
+});
 
 provide("refresh", () => {
-  fetchMore({
-    variables: params.value,
-    updateQuery,
-  });
+  refetch();
 });
 
 const {
   mutate: updateStatus,
   loading: loadingUpdateStatus,
   onDone: onStatusUpdated,
-} = useMutation<{ updateStatus: { result: string } }, { stageId: string }>(gql`
-  mutation UpdateStatus($stageId: ID!) {
-    updateStatus(stageId: $stageId) {
+} = useMutation<{ updateStatus: { result: string } }, { id: string }>(gql`
+  mutation UpdateStatus($id: ID!) {
+    updateStatus(id: $id) {
       result
     }
   }
 `);
 const handleChangeStatus = async (record: Stage) => {
   await updateStatus({
-    stageId: record.id,
+    id: record.id,
   });
 };
 
@@ -238,10 +217,10 @@ const {
   mutate: updateVisibility,
   loading: loadingUpdateVisibility,
   onDone: onVisibilityUpdated,
-} = useMutation<{ updateVisibility: { result: string } }, { stageId: string }>(
+} = useMutation<{ updateVisibility: { result: string } }, { id: string }>(
   gql`
-    mutation UpdateVisibility($stageId: ID!) {
-      updateVisibility(stageId: $stageId) {
+    mutation UpdateVisibility($id: ID!) {
+      updateVisibility(id: $id) {
         result
       }
     }
@@ -249,7 +228,7 @@ const {
 );
 const handleChangeVisibility = async (record: Stage) => {
   await updateVisibility({
-    stageId: record.id,
+    id: record.id,
   });
 };
 
@@ -259,10 +238,7 @@ const handleUpdate = (result: FetchResult) => {
   } else {
     message.error("You don't have permission to perform this action!");
   }
-  fetchMore({
-    variables: params.value,
-    updateQuery,
-  });
+  refetch();
 };
 
 onStatusUpdated(handleUpdate);
@@ -273,11 +249,11 @@ onVisibilityUpdated(handleUpdate);
   <a-layout class="w-full rounded-xl bg-white overflow-hidden">
     <a-table class="w-full shadow overflow-auto" :columns="columns as ColumnType<Stage>[]" :data-source="dataSource"
       rowKey="id" :loading="loading" @change="handleTableChange" :pagination="{
-      showQuickJumper: true,
-      showSizeChanger: true,
-      total: result ? result.stages.totalCount : 0,
-    } as Pagination
-      ">
+        showQuickJumper: true,
+        showSizeChanger: true,
+        total: result ? result.stages.totalCount : 0,
+      } as Pagination
+        ">
       <template #bodyCell="{ column, record, text }">
         <template v-if="column.key === 'cover'">
           <a-image :src="text ? absolutePath(text) : '/img/greencurtain.jpg'" class="w-24 max-h-24 object-contain" />

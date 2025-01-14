@@ -21,7 +21,7 @@ const showStreamInstruction = ref(false);
 
 <template>
   <audio v-if="props.media.assetType.name === 'audio'" controls class="w-48">
-    <source :src="absolutePath(props.media.src)" />
+    <source :src="absolutePath(props.media.fileLocation)" />
     Your browser does not support the audio element.
   </audio>
   <template v-else-if="props.media.assetType.name === 'stream'">
@@ -52,20 +52,20 @@ const showStreamInstruction = ref(false);
           </a-col>
           <a-col :span="18">
             <div class="card-container pr-4">
-              <OBSInstruction :url="props.media.src" :sign="props.media.sign" />
+              <OBSInstruction :url="props.media.fileLocation" :sign="props.media.sign" />
             </div>
           </a-col>
         </a-row>
       </a-modal>
     </div>
     <video v-else controls class="w-48">
-      <source :src="absolutePath(props.media.src)" />
+      <source :src="absolutePath(props.media.fileLocation)" />
       Your browser does not support the video tag.
     </video>
   </template>
   <template v-else>
     <a-image
-      :src="absolutePath(props.media.src)"
+      :src="absolutePath(props.media.fileLocation)"
       class="w-24 max-h-24 object-contain"
     />
     <a-popover v-if="attributes.multi" placement="right">

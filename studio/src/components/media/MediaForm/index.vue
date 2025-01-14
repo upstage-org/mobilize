@@ -176,18 +176,12 @@ const { result, loading } = useQuery<StudioGraph>(
   gql`
     {
       mediaTypes {
-        edges {
-          node {
-            name
-          }
-        }
+        id
+        name
       }
       tags {
-        edges {
-          node {
-            name
-          }
-        }
+        id
+        name
       }
     }
   `,
@@ -196,16 +190,16 @@ const { result, loading } = useQuery<StudioGraph>(
 );
 const mediaTypes = computed(() => {
   if (result.value?.mediaTypes) {
-    return result.value.mediaTypes.edges
+    return result.value.mediaTypes
       .filter(
-        ({ node }) =>
+        (node) =>
           !(
             editingMediaResult.value
               ? ["media", "stream", "shape"]
               : ["media", "shape"]
           ).includes(node.name.toLowerCase()),
       )
-      .map(({ node }) => ({ label: capitalize(node.name), value: node.name }));
+      .map((node) => ({ label: capitalize(node.name), value: node.name }));
   }
   return [];
 });
@@ -498,7 +492,7 @@ const clearSign = () => {
           placeholder="Tags"
           :options="
             result
-              ? result.tags.edges.map(({ node }) => ({
+              ? result.tags.map((node) => ({
                   value: node.name,
                   label: node.name,
                 }))

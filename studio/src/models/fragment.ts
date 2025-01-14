@@ -1,7 +1,7 @@
 import gql from "graphql-tag";
 
 export const permissionFragment = gql`
-  fragment permissionFragment on AssetUsage {
+  fragment permissionFragment on Permission {
     id
     userId
     assetId
@@ -19,7 +19,6 @@ export const permissionFragment = gql`
 export const adminPlayerFragment = gql`
   fragment adminPlayerFragment on AdminPlayer {
     id
-    dbId
     username
     firstName
     lastName

@@ -13,26 +13,29 @@ export default {
       return state.nginx.uploadLimit ?? 1024 * 1024;
     },
     termsOfService(state) {
-      return state.system.termsOfService;
+      return state.system.termsOfService?.value;
     },
     manual(state) {
-      return state.system.manual;
+      return state.system.manual?.value;
     },
     esp(state) {
-      return state.system.esp;
+      return state.system.esp?.value;
     },
     enableDonate(state) {
-      return state.system.enableDonate;
+      return state.system.enableDonate?.value;
     },
     foyer(state) {
       return state.foyer ?? {};
+    },
+    system(state) {
+      return state.system ?? {};
     },
     navigations(state) {
       if (!state.foyer) {
         return [];
       }
       try {
-        const lines = state.foyer.menu
+        const lines = (state.foyer.menu?.value || "")
           .split("\n")
           .filter((line) => line.trim().length > 0);
         const navigations = [];
