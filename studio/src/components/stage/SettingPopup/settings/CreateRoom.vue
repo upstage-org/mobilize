@@ -5,8 +5,13 @@
   <div class="card-content voice-parameters">
     <form @submit.prevent="createRoom">
       <HorizontalField title="Room name">
-        <Field v-model="form.name" required required-message="Room name is required" pattern="^[^?&:&quot;'%#]+$"
-          title="Meeting name should not contain any of these characters: ?, &, :, ', &quot;, %, #.">
+        <Field
+          v-model="form.name"
+          required
+          required-message="Room name is required"
+          pattern="^[^?&:&quot;'%#]+$"
+          title="Meeting name should not contain any of these characters: ?, &, :, ', &quot;, %, #."
+        >
         </Field>
       </HorizontalField>
       <SaveButton :disabled="!form.name.trim()">{{
@@ -34,7 +39,7 @@ export default {
       store.commit("stage/CREATE_ROOM", {
         type: "meeting",
         name: form.name,
-        description: store.state.user.user?.email,
+        description: "",
         w: stageSize.value.width / 2,
         h: stageSize.value.height / 2,
       });

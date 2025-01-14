@@ -46,7 +46,6 @@ import { computed } from "vue";
 import { useStore } from "vuex";
 import Avatar from "components/objects/Avatar/index.vue";
 import Drawing from "components/objects/Drawing.vue";
-import Stream from "components/objects/Streamer/index.vue";
 import Meeting from "components/objects/Meeting/index.vue";
 import Jitsi from "components/objects/Meeting/Jitsi.vue";
 import Text from "components/objects/Text.vue";
@@ -60,7 +59,6 @@ export default {
   components: {
     Avatar,
     Prop: Avatar,
-    Stream,
     Drawing,
     Text,
     Curtain,

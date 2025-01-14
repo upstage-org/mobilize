@@ -110,6 +110,7 @@ export default {
     purchasePopup: {
       isActive: false,
     },
+    reloadStreams: null
   },
   getters: {
     ready(state) {
@@ -197,6 +198,9 @@ export default {
     },
     jitsiTracks(state) {
       return state.board.tracks;
+    },
+    reloadStreams(state) {
+      return state.reloadStreams;
     },
   },
   mutations: {
@@ -680,6 +684,9 @@ export default {
     },
     ADD_TRACK(state, track) {
       state.board.tracks = [...state.board.tracks, track];
+    },
+    RELOAD_STREAMS(state) {
+      state.reloadStreams = new Date();
     },
   },
   actions: {
@@ -1393,6 +1400,9 @@ export default {
     },
     addTrack({ commit }, track) {
       commit("ADD_TRACK", track);
+    },
+    reloadStreams({ commit }) {
+      commit("RELOAD_STREAMS");
     },
   },
 };
