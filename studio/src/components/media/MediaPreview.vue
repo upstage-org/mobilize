@@ -2,8 +2,6 @@
 import { PropType, computed, ref } from "vue";
 import { Media, MediaAttributes } from "models/studio";
 import { absolutePath } from "utils/common";
-import LarixQRCode from "components/qrcode/LarixQRCode.vue";
-import OBSInstruction from "components/OBSInstruction.vue";
 
 const props = defineProps({
   media: {
@@ -25,40 +23,7 @@ const showStreamInstruction = ref(false);
     Your browser does not support the audio element.
   </audio>
   <template v-else-if="props.media.assetType.name === 'stream'">
-    <div v-if="attributes.isRTMP" controls class="w-48">
-      <LarixQRCode
-        @click="showStreamInstruction = true"
-        :stream="media"
-        :size="192"
-      />
-      <a-modal
-        v-model:visible="showStreamInstruction"
-        :footer="null"
-        :width="1000"
-      >
-        <template #title>
-          <h3 class="mb-0">{{ props.media.name }} Setup Info</h3>
-        </template>
-        <a-row :gutter="12">
-          <a-col :span="6">
-            <span>Scan this QR Code to start streaming with Larix:</span>
-            <div class="flex flex-row justify-center h-full max-h-96">
-              <LarixQRCode
-                @click="showStreamInstruction = true"
-                :stream="media"
-                :size="256"
-              />
-            </div>
-          </a-col>
-          <a-col :span="18">
-            <div class="card-container pr-4">
-              <OBSInstruction :url="props.media.fileLocation" :sign="props.media.sign" />
-            </div>
-          </a-col>
-        </a-row>
-      </a-modal>
-    </div>
-    <video v-else controls class="w-48">
+    <video controls class="w-48">
       <source :src="absolutePath(props.media.fileLocation)" />
       Your browser does not support the video tag.
     </video>

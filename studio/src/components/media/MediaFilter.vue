@@ -137,29 +137,8 @@ const handleFilterStageName = (keyword: string, option: any) => {
   return option.label.toLowerCase().includes(keyword.toLowerCase());
 };
 
-const files = inject<Ref<UploadFile[]>>("files");
 const visibleDropzone = inject("visibleDropzone");
 const composingMode = inject("composingMode");
-const to = (path: string) => `${configs.UPSTAGE_URL}/${path}`;
-const createRTMPStream = () => {
-  if (files) {
-    files.value = [
-      {
-        id: 0,
-        preview: "",
-        url: "",
-        status: "virtual",
-        file: {
-          name: result?.value
-            ? `${result.value.whoami.displayName || result.value.whoami.username
-            }'s stream`
-            : "Stream name",
-          type: "video",
-        } as File,
-      },
-    ];
-  }
-};
 
 const VNodes = (_: any, { attrs }: { attrs: any }) => {
   return attrs.vnodes;
@@ -176,19 +155,9 @@ const VNodes = (_: any, { attrs }: { attrs: any }) => {
           </template>
           Back to editing
         </a-button>
-        <a-dropdown-button type="primary" v-else @click="visibleDropzone = true">
+        <a-button type="primary" v-else @click="visibleDropzone = true">
           <PlusOutlined /> {{ $t("new") }} {{ $t("media") }}
-          <template #overlay>
-            <a-menu>
-              <a-menu-item key="rtmp" @click="createRTMPStream">
-                <template #icon>
-                  <video-camera-add-outlined />
-                </template>
-                RTMP Stream
-              </a-menu-item>
-            </a-menu>
-          </template>
-        </a-dropdown-button>
+        </a-button>
         <a-input-search allowClear class="w-48" placeholder="Search media" v-model:value="name" />
         <a-select allowClear showArrow :filterOption="handleFilterOwnerName" mode="tags" style="min-width: 124px"
           placeholder="Owners" :loading="loading" v-model:value="owners" :options="result?.value

@@ -123,7 +123,6 @@ export default {
   foyer_customisation: "Tùy chỉnh tiền sảnh",
   email_notification: "Thông báo qua email",
   system_configuration: "Cấu hình hệ thông",
-  rtmp_stream: "Luồng RTMP",
   stop_streaming: "Ngừng phát trực tuyến",
   media_name: "Tên phương tiện",
   media_type: "Loại phương tiện",

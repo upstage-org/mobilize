@@ -212,11 +212,7 @@ export default {
               Object.assign(item, meta);
             }
             if (item.type === "stream") {
-              if (item.isRTMP) {
-                item.url = item.src;
-              } else {
-                item.url = absolutePath(item.src);
-              }
+              item.url = absolutePath(item.src);
               delete item.src;
             } else {
               item.src = absolutePath(item.src);

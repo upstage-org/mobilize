@@ -9,10 +9,7 @@
           </div>
           <div class="column is-narrow">
             <Field horizontal label="Media Type">
-              <button v-if="media.isRTMP" class="button" disabled>
-                {{ $t("stream") }}
-              </button>
-              <MediaType v-else v-model="form.mediaType" :data="availableTypes" />
+              <MediaType v-model="form.mediaType" :data="availableTypes" />
             </Field>
           </div>
           <div class="column">
@@ -31,11 +28,8 @@
         </template>
         <template #preview>
           <div class="preview">
-            <template v-if="!media.isRTMP">
+            <template>
               <Asset :asset="media" @detect-size="updateMediaSize" />
-            </template>
-            <template v-else>
-              <StreamPreview :media="media" v-model="form.src" />
             </template>
           </div>
         </template>
@@ -109,7 +103,6 @@ import MultiTransferColumn from "components/MultiTransferAccessColumn.vue";
 import VoiceParameters from "components/stage/SettingPopup/settings/VoiceParameters.vue";
 import { displayName } from "utils/auth";
 import { MEDIA_COPYRIGHT_LEVELS } from "utils/constants";
-import StreamPreview from "./StreamPreview.vue";
 import Multiframe from "./Multiframe.vue";
 import Switch from "components/form/Switch.vue";
 
@@ -126,7 +119,6 @@ export default {
     Upload,
     MultiTransferColumn,
     Dropdown,
-    StreamPreview,
     Multiframe,
     Switch,
   },
@@ -150,9 +142,6 @@ export default {
     if (form.assetType) {
       form.assetType = form.assetType.name;
     }
-    if (form.isRTMP && form.src.includes("?")) {
-      form.src = form.src.split("?")[0];
-    }
 
     const { mutation: uploadMedia } = useMutation(stageGraph.uploadMedia);
     const { mutation: updateMedia } = useMutation(stageGraph.updateMedia);
@@ -172,24 +161,13 @@ export default {
         } = form;
         let msg = "Media updated successfully!";
         if (!form.id) {
-          if (form.isRTMP) {
-            const response = await updateMedia({
-              name,
-              mediaType,
-              fileLocation: form.src,
-              copyrightLevel,
-              playerAccess,
-            });
-            Object.assign(form, response.updateMedia.asset);
-          } else {
-            const response = await uploadMedia({
+          const response = await uploadMedia({
               name,
               base64,
               mediaType,
               filename,
             });
             Object.assign(form, response.uploadMedia.asset);
-          }
           msg = "Media created successfully!";
         }
         const stageIds = form.assignedStages.map((s) => s.dbId);
@@ -199,7 +177,6 @@ export default {
           frames,
           voice,
           link,
-          isRTMP,
           src,
           w,
           h,
@@ -215,7 +192,6 @@ export default {
             frames,
             voice,
             link,
-            isRTMP,
             w,
             h,
           }),

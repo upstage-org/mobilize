@@ -149,7 +149,6 @@ export default {
   foyer_customisation: "Anpassning av Foajén",
   email_notification: "E-postanmälan",
   system_configuration: "Systemkonfiguration",
-  rtmp_stream: "RTMP Stream",
   stop_streaming: "Stoppa strömning",
   media_name: "Medienamn",
   media_type: "Mediatyp",

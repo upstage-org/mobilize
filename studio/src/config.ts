@@ -71,15 +71,7 @@ const configs = {
     connectTimeout: 4000, // Time out
     reconnectPeriod: 4000, // Reconnection interval
     retain: true,
-  },
-  STREAMING: {
-    publish: VITE_STREAMING_PUBLISH_ENDPOINT,
-    subscribe: VITE_STREAMING_SUBSCRIBE_ENDPOINT,
-    auth: {
-      username: VITE_STREAMING_USERNAME,
-      password: VITE_STREAMING_PASSWORD,
-    },
-  },
+  }
 };
 
 export default configs;

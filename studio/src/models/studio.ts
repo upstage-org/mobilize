@@ -106,7 +106,6 @@ export interface MediaAttributes {
   frames: string[];
   voice: AvatarVoice;
   link: Link;
-  isRTMP: boolean;
   w: number;
   h: number;
   note: string;

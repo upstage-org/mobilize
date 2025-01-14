@@ -148,7 +148,6 @@ export default {
   foyer_customisation: "Personalizar el hogar",
   email_notification: "Notificación de correo electrónico",
   system_configuration: "Configuración del sistema",
-  rtmp_stream: "Transmisión RTMP",
   stop_streaming: "Dehar de transmitir",
   media_name: "Nombre del media",
   media_type: "Tipo de media",

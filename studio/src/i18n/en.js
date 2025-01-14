@@ -126,7 +126,6 @@ export default {
   foyer_customisation: "Foyer Customisation",
   email_notification: "Email Notification",
   system_configuration: "System Configuration",
-  rtmp_stream: "RTMP Stream",
   stop_streaming: "Stop Streaming",
   media_name: "Media Name",
   media_type: "Media Type",
