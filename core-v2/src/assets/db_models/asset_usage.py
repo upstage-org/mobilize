@@ -1,4 +1,5 @@
 from datetime import datetime
+from enum import Enum
 from sqlalchemy import (
     BigInteger,
     Boolean,
@@ -23,3 +24,16 @@ class AssetUsageModel(BaseModel):
     created_on = Column(DateTime, nullable=False, default=datetime.utcnow)
     user = relationship("UserModel", foreign_keys=[user_id])
     asset = relationship("AssetModel", foreign_keys=[asset_id])
+
+
+class NotificationType(Enum):
+    MEDIA_USAGE = 1
+
+
+class Notification:
+    def __init__(self, type, mediaUsage):
+        self.type = type
+        self.mediaUsage = mediaUsage
+
+    type = NotificationType
+    mediaUsage = AssetUsageModel

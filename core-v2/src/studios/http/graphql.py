@@ -662,7 +662,15 @@ type_defs = gql("""
         foyer: FoyerConfig!
                 
         voices: [Voice!]
+                
+        notifications: [Notification]
     }    
+                
+    type Notification {
+        type: Int
+        mediaUsage: AssetUsage
+    }
+            
 
     type Voice {
         avatar: Asset
@@ -682,4 +690,17 @@ type_defs = gql("""
         name: String
         description: String
     }
+                
+    type AssetUsage {
+        id: ID!
+        assetId: Int!
+        userId: Int!
+        approved: Boolean!
+        seen: Boolean!
+        note: String
+        createdOn: String!
+        user: User
+        asset: Asset
+    }
+
 """)

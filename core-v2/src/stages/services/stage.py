@@ -13,6 +13,7 @@ from global_config import (
     SECRET_KEY,
 )
 
+from assets.db_models.asset_usage import AssetUsageModel, NotificationType
 from users.db_models.user import ADMIN, SUPER_ADMIN
 from stages.http.validation import (
     DuplicateStageInput,
@@ -534,5 +535,29 @@ class StageService:
             convert_keys_to_camel_case(stage.to_dict())
             for stage in DBSession.query(StageModel)
             .filter(StageModel.attributes.any(name="visibility", description="true"))
+            .all()
+        ]
+
+    def get_notifications(self, user: UserModel):
+        print("user", user.id)
+
+        print(
+            [
+                convert_keys_to_camel_case(
+                    {"type": NotificationType.MEDIA_USAGE.value, "mediaUsage": x.to_dict()}
+                )
+                for x in DBSession.query(AssetUsageModel)
+                .filter(AssetUsageModel.approved.is_(False))
+                .filter(AssetUsageModel.asset.has(owner_id=user.id))
+                .all()
+            ]
+        )
+
+        return [
+            convert_keys_to_camel_case(
+                {"type": NotificationType.MEDIA_USAGE.value, "mediaUsage": x.to_dict()}
+            )
+            for x in DBSession.query(AssetUsageModel).filter(AssetUsageModel.approved == False)
+            .filter(AssetUsageModel.asset.has(owner_id=user.id))
             .all()
         ]

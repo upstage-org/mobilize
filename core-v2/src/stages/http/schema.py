@@ -53,6 +53,14 @@ def get_stage(_, info, id: int):
     )
 
 
+@query.field("notifications")
+@authenticated(allowed_roles=[SUPER_ADMIN, ADMIN, PLAYER])
+def get_notifications(_, info):
+    return StageService().get_notifications(
+        UserModel(**info.context["request"].state.current_user)
+    )
+
+
 @mutation.field("createStage")
 @authenticated(allowed_roles=[SUPER_ADMIN, ADMIN, PLAYER])
 def create_stage(_, info, input):
