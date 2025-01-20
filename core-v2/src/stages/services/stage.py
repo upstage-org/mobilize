@@ -544,7 +544,10 @@ class StageService:
         print(
             [
                 convert_keys_to_camel_case(
-                    {"type": NotificationType.MEDIA_USAGE.value, "mediaUsage": x.to_dict()}
+                    {
+                        "type": NotificationType.MEDIA_USAGE.value,
+                        "mediaUsage": x.to_dict(),
+                    }
                 )
                 for x in DBSession.query(AssetUsageModel)
                 .filter(AssetUsageModel.approved.is_(False))
@@ -557,7 +560,8 @@ class StageService:
             convert_keys_to_camel_case(
                 {"type": NotificationType.MEDIA_USAGE.value, "mediaUsage": x.to_dict()}
             )
-            for x in DBSession.query(AssetUsageModel).filter(AssetUsageModel.approved == False)
+            for x in DBSession.query(AssetUsageModel)
+            .filter(AssetUsageModel.approved == False)
             .filter(AssetUsageModel.asset.has(owner_id=user.id))
             .all()
         ]

@@ -184,7 +184,7 @@ class StudioService:
             user.last_name = input.lastName
         if input.displayName:
             user.display_name = input.displayName
-        if input.active:
+        if input.active != user.active:
             user.active = input.active
             await self._handle_active_status(user, input.active)
         if input.firebasePushnotId:
