@@ -328,21 +328,20 @@ class AssetService:
 
     def process_file_location(self, input, local_db_session, asset):
         file_location = input["urls"][0] if "urls" in input else input.urls[0]
-        asset.file_location = uuid.uuid4()
         if "?" in file_location:
             file_location = file_location[: file_location.index("?")]
-            if file_location != asset.file_location and "/" not in file_location:
-                existed_asset = (
-                    local_db_session.query(AssetModel)
-                    .filter(AssetModel.file_location == file_location)
-                    .filter(AssetModel.id != asset.id)
-                    .first()
+        if file_location != asset.file_location and "/" not in file_location:
+            existed_asset = (
+                local_db_session.query(AssetModel)
+                .filter(AssetModel.file_location == file_location)
+                .filter(AssetModel.id != asset.id)
+                .first()
+            )
+            if existed_asset:
+                raise GraphQLError(
+                    "Stream with the same key already existed, please pick another unique key!"
                 )
-                if existed_asset:
-                    raise GraphQLError(
-                        "Stream with the same key already existed, please pick another unique key!"
-                    )
-            asset.file_location = file_location
+        asset.file_location = file_location
 
         return file_location
 
