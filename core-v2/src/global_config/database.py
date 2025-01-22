@@ -30,6 +30,8 @@ engine = create_engine(
     pool_size=50,
     max_overflow=100,
     pool_pre_ping=True,
+    isolation_level="READ UNCOMMITTED",
+    query_cache_size=0 
 )
 metadata.create_all(engine)
 DBSession = scoped_session(
