@@ -143,8 +143,8 @@ class StudioService:
                 session.add(user)
                 session.flush()
                 session.commit()
-            user = self._get_user(DBSession, input.id)
-            return convert_keys_to_camel_case(user.to_dict())
+                user = self._get_user(session, input.id)
+                return convert_keys_to_camel_case(user.to_dict())
         except Exception as e:
             raise GraphQLError(
                 f"There was an error updating this user information: {str(e)}. Please check the logs and try again later!"
