@@ -24,15 +24,7 @@ db = declarative_base()
 database = Database(DATABASE_URL)
 metadata = MetaData()
 
-engine = create_engine(
-    DATABASE_URL,
-    echo=False,
-    pool_size=50,
-    max_overflow=100,
-    pool_pre_ping=True,
-    isolation_level="READ UNCOMMITTED",
-    query_cache_size=0 
-)
+engine = create_engine(DATABASE_URL, poolclass=NullPool, query_cache_size=0)
 metadata.create_all(engine)
 DBSession = scoped_session(
     sessionmaker(
@@ -100,4 +92,5 @@ class ScopedSession(object):
         finally:
             print("Closing session")
             self.session.close()
-            self.session.remove
+            self.session.remove()
+            DBSession.expire_all()
