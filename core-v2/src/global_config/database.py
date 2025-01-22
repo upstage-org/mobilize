@@ -26,7 +26,14 @@ metadata = MetaData()
 
 engine = create_engine(DATABASE_URL, poolclass=NullPool)
 metadata.create_all(engine)
-DBSession = scoped_session(sessionmaker(autocommit=False, autoflush=True, bind=engine))
+DBSession = scoped_session(
+    sessionmaker(
+        autobegin=True,
+        autoflush=False,
+        bind=engine,
+        join_transaction_mode="rollback_only",
+    )
+)
 
 
 def get_scoped_session():

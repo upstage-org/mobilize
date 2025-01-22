@@ -98,6 +98,8 @@ class AssetService:
                 )
             )
 
+        query = query.order_by(AssetModel.id)
+
         if search_assets.sort:
             sort = search_assets.sort
             for sort_option in sort:

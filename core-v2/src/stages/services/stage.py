@@ -59,6 +59,8 @@ class StageService:
                 )
             )
 
+        query = query.order_by(StageModel.id)
+
         if input.sort:
             sort = input.sort
             for sort_option in sort:
@@ -104,8 +106,6 @@ class StageService:
         current_user_id = None
         token = authorization.split(" ")[1] if authorization else None
 
-        print("token", token)
-
         if token:
             payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             print("payload", payload)
@@ -123,6 +123,7 @@ class StageService:
         if input.fileLocation:
             query = query.filter(StageModel.file_location == input.fileLocation)
 
+        query = query.order_by(StageModel.id)
         stages = query.all()
 
         return [
