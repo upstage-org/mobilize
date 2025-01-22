@@ -38,7 +38,7 @@ DBSession = scoped_session(
         autoflush=False,
         bind=engine,
         join_transaction_mode="rollback_only",
-        expire_on_commit=False,
+        expire_on_commit=True,
     )
 )
 
