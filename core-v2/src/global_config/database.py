@@ -24,7 +24,13 @@ db = declarative_base()
 database = Database(DATABASE_URL)
 metadata = MetaData()
 
-engine = create_engine(DATABASE_URL, poolclass=NullPool)
+engine = create_engine(
+    DATABASE_URL,
+    echo=False,
+    pool_size=50,
+    max_overflow=100,
+    pool_pre_ping=True,
+)
 metadata.create_all(engine)
 DBSession = scoped_session(
     sessionmaker(
@@ -32,6 +38,7 @@ DBSession = scoped_session(
         autoflush=False,
         bind=engine,
         join_transaction_mode="rollback_only",
+        expire_on_commit=False,
     )
 )
 
