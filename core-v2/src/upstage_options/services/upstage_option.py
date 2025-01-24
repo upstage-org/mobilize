@@ -23,8 +23,8 @@ prodder = os.path.abspath(os.path.join(app_dir, "../.."))
 
 
 class SettingService:
-    def get_config(self, name: str):
-        return DBSession.query(ConfigModel).filter_by(name=name).first()
+    def get_config(self, name: str, session = DBSession):
+        return session.query(ConfigModel).filter_by(name=name).first()
 
     def upload_limit(self):
         limit = 0
@@ -64,7 +64,7 @@ class SettingService:
 
     def update_terms_of_service(self, url: str):
         with ScopedSession() as local_db_session:
-            config = self.get_config(TERMS_OF_SERVICE)
+            config = self.get_config(TERMS_OF_SERVICE, local_db_session)
             if not config:
                 config = ConfigModel(name=TERMS_OF_SERVICE, value=url)
                 local_db_session.add(config)
@@ -76,12 +76,13 @@ class SettingService:
 
     def save_config(self, input: ConfigInput):
         with ScopedSession() as local_db_session:
-            config = self.get_config(input.name)
+            config = self.get_config(input.name, local_db_session)
             if not config:
                 config = ConfigModel(name=input.name, value=input.value)
                 local_db_session.add(config)
             else:
                 config.value = input.value
+
             local_db_session.flush()
 
         config = self.get_config(input.name)
