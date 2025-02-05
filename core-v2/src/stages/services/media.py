@@ -160,9 +160,20 @@ class MediaService:
 
     def delete_media(self, id: int):
         with ScopedSession() as local_db_session:
-            asset = local_db_session.query(AssetModel).filter_by(id=id).first()
+            asset = (
+                local_db_session.query(AssetModel)
+                .outerjoin(ParentStageModel)
+                .filter_by(id=id)
+                .first()
+            )
             if not asset:
                 raise GraphQLError("Media not found")
+
+            if asset.stages:
+                asset.dormant = True
+                local_db_session.flush()
+                return
+
             physical_path = self.remove_media_frames_and_get_path(
                 local_db_session, asset
             )
@@ -172,7 +183,9 @@ class MediaService:
             self.cleanup_related_entities(id, local_db_session)
             self.remove_asset_from_frames(local_db_session, asset)
             local_db_session.delete(asset)
-            return {"success": True, "message": "Media deleted successfully"}
+            local_db_session.flush()
+
+        return {"success": True, "message": "Media deleted successfully"}
 
     def remove_media_frames_and_get_path(self, local_db_session, asset):
         if asset.description:

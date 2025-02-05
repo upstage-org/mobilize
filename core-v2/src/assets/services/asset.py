@@ -48,6 +48,9 @@ class AssetService:
             .outerjoin(AssetLicenseModel)
         )
 
+        if user.role not in [SUPER_ADMIN, ADMIN]:
+            query = query.filter(AssetModel.dormant.is_not(True))
+
         if "mediaType" in filter:
             query = query.filter(AssetTypeModel.name == filter["mediaType"])
 
@@ -365,7 +368,10 @@ class AssetService:
     def delete_media(self, owner: UserModel, id: int):
         with ScopedSession() as local_db_session:
             asset = (
-                local_db_session.query(AssetModel).filter(AssetModel.id == id).first()
+                local_db_session.query(AssetModel)
+                .outerjoin(ParentStageModel)
+                .filter(AssetModel.id == id)
+                .first()
             )
 
             if not asset:
@@ -377,14 +383,19 @@ class AssetService:
                     "message": "Only media owner or admin can delete this media!",
                 }
 
-            self.cleanup_assets(local_db_session, asset)
-            local_db_session.delete(asset)
-            local_db_session.flush()
+            print(len(list(asset.to_dict()["stages"])))
+            if len(list(asset.to_dict()["stages"])):
+                asset.dormant = True
+                local_db_session.flush()
+            else:
+                self.cleanup_assets(local_db_session, asset)
+                local_db_session.delete(asset)
+                local_db_session.flush()
 
-            return {
-                "success": True,
-                "message": "Media deleted successfully!",
-            }
+        return {
+            "success": True,
+            "message": "Media deleted successfully!",
+        }
 
     def cleanup_assets(self, local_db_session, asset: AssetModel):
         if asset.description:

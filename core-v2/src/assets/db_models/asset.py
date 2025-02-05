@@ -7,11 +7,10 @@ from sqlalchemy import (
     Integer,
     String,
     Text,
+    Boolean,
 )
 from sqlalchemy.orm import relationship
-from assets.db_models.asset_type import AssetTypeModel
 from global_config import BaseModel
-from users.db_models.user import UserModel
 
 
 class AssetModel(BaseModel):
@@ -28,6 +27,7 @@ class AssetModel(BaseModel):
     updated_on = Column(TIMESTAMP(timezone=True), default=datetime.now)
     size = Column(BigInteger, nullable=False, default=0)
     copyright_level = Column(Integer, nullable=False, default=0)
+    dormant = Column(Boolean, nullable=False, default=False)
     asset_type = relationship("AssetTypeModel", foreign_keys=[asset_type_id])
     owner = relationship("UserModel", foreign_keys=[owner_id])
     asset_license = relationship("AssetLicenseModel", uselist=False, backref="asset")

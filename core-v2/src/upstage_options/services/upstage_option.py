@@ -23,7 +23,7 @@ prodder = os.path.abspath(os.path.join(app_dir, "../.."))
 
 
 class SettingService:
-    def get_config(self, name: str, session = DBSession):
+    def get_config(self, name: str, session=DBSession):
         return session.query(ConfigModel).filter_by(name=name).first()
 
     def upload_limit(self):
