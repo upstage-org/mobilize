@@ -286,6 +286,7 @@ type_defs = gql("""
         description: String
         assetType: AssetType
         owner: User
+        dormant: Boolean
         stages: [Stage]
         tags: [String]
         copyrightLevel: Int
