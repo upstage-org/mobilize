@@ -564,7 +564,21 @@ mutation {
         mediaIds: ["1", "2"]
     }) {
         id
+        status
         name
+        fileLocation
+        status
+        visibility
+        cover
+        description
+        playerAccess
+        permission
+        lastAccess
+        owner {
+            id
+            username
+            displayName
+        }
     }
 }
 ```
