@@ -284,7 +284,7 @@ class AssetService:
                     size = 0  # file not exist
                 asset.size += size
 
-            attributes["multi"] = True if len(urls) > 0 else False
+            attributes["multi"] = True if len(urls) > 1 else False
             attributes["frames"] = attributes["frames"] if len(urls) > 0 else []
             attributes["w"] = input.w
             attributes["h"] = input.h
@@ -308,10 +308,10 @@ class AssetService:
             attributes["note"] = input.note
             asset.description = json.dumps(attributes)
             local_db_session.flush()
-        if input.stageIds != None:
-            asset.stages = []
+        if len(input.stageIds):
+            asset.stages.delete()
             for id in input.stageIds:
-                asset.stages.append(ParentStageModel(stage_id=id))
+                asset.stages.append(ParentStageModel(stage_id=id, child_asset_id=asset.id))
 
     def change_owner(self, owner: UserModel, local_db_session, asset: AssetModel):
         if owner:
