@@ -1,7 +1,7 @@
 {
   "name": "studio",
-  "version": "2.0.9",
-  "versionAlias": "Kona-2.0.9",
+  "version": "2.1.0",
+  "versionAlias": "Monteiths-2.1.0",
   "license": "GPL-3.0",
   "scripts": {
     "serve": "vite --port=3000 --host",
@@ -60,7 +60,7 @@
     "tailwindcss": "^3.4.0",
     "unplugin-vue-components": "^0.26.0",
     "uuid": "^9.0.1",
-    "vue": "^3.3.13",
+    "vue": "^3.5.1",
     "vue-i18n": "^9.5.0",
     "vue-router": "4",
     "vue-slicksort": "^2.0.0-alpha.5",

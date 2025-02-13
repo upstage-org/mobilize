@@ -62,8 +62,8 @@
       <p class="control menu-group-item">
         <a-tooltip title="Opacity slider">
           <button class="button is-light" :class="{
-      'has-background-primary-light': sliderMode === 'opacity',
-    }" @click="changeSliderMode('opacity')">
+            'has-background-primary-light': sliderMode === 'opacity',
+          }" @click="changeSliderMode('opacity')">
             <span class="mt-1">
               <Icon src="opacity-slider.svg" />
             </span>
@@ -73,8 +73,8 @@
       <p v-if="object.multi" class="control menu-group-item">
         <a-tooltip title="Animation speed">
           <button class="button is-light" :class="{
-      'has-background-warning-light': sliderMode === 'animation',
-    }" @click="changeSliderMode('animation')">
+            'has-background-warning-light': sliderMode === 'animation',
+          }" @click="changeSliderMode('animation')">
             <span class="mt-1">
               <Icon src="animation-slider.svg" />
             </span>
@@ -84,8 +84,8 @@
       <p class="control menu-group-item">
         <a-tooltip title="Move speed">
           <button class="button is-light" :class="{
-      'has-background-danger-light': sliderMode === 'speed',
-    }" @click="changeSliderMode('speed')">
+            'has-background-danger-light': sliderMode === 'speed',
+          }" @click="changeSliderMode('speed')">
             <span class="mt-1">
               <Icon src="movement-slider.svg" />
             </span>
@@ -104,8 +104,8 @@
       <p class="control menu-group-item">
         <a-tooltip title="Flip Horizontal">
           <button class="button is-light" :class="{
-      'has-background-primary-light': object.scaleX === -1,
-    }" @click="flipHorizontal">
+            'has-background-primary-light': object.scaleX === -1,
+          }" @click="flipHorizontal">
             <span class="mt-1">{{ $t("horizontal") }}</span>
           </button>
         </a-tooltip>
@@ -113,8 +113,8 @@
       <p class="control menu-group-item">
         <a-tooltip title="Flip Vertical">
           <button class="button is-light" :class="{
-      'has-background-primary-light': object.scaleY === -1,
-    }" @click="flipVertical">
+            'has-background-primary-light': object.scaleY === -1,
+          }" @click="flipVertical">
             <span class="mt-1">{{ $t("vertical") }}</span>
           </button>
         </a-tooltip>

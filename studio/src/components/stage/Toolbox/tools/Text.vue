@@ -1,15 +1,10 @@
 <template>
-  <section
-    v-show="isWriting"
-    class="writing"
-    @click="onClickWriting"
-    :style="{
-      width: stageSize.width + 'px',
-      height: stageSize.height + 'px',
-      top: stageSize.top + 'px',
-      left: stageSize.left + 'px',
-    }"
-  >
+  <section v-show="isWriting" class="writing" @click="onClickWriting" :style="{
+    width: stageSize.width + 'px',
+    height: stageSize.height + 'px',
+    top: stageSize.top + 'px',
+    left: stageSize.left + 'px',
+  }">
     <p ref="el" :style="options" contenteditable="true">
       Write or paste
       <br />your text here
@@ -22,20 +17,13 @@
       </div>
       <span class="tag is-block">{{ $t("new_text") }}</span>
     </div>
-    <div
-      v-for="text in savedTexts"
-      :key="text"
-      class="is-pulled-left saved-text"
-    >
+    <div v-for="text in savedTexts" :key="text" class="is-pulled-left saved-text">
       <ContextMenu>
         <template #trigger>
           <Skeleton :data="text" />
         </template>
         <template #context>
-          <a
-            class="panel-block has-text-danger"
-            @click="deleteTextPermanently(text)"
-          >
+          <a class="panel-block has-text-danger" @click="deleteTextPermanently(text)">
             <span class="panel-icon">
               <Icon src="remove.svg" />
             </span>
@@ -48,12 +36,7 @@
   <template v-else>
     <div class="text-tool" style="width: 200px; z-index: 1005">
       <span class="tag muted is-block">{{ $t("font") }}</span>
-      <Dropdown
-        class="font-dropdown"
-        v-model="options.fontFamily"
-        :data="fontFamilies"
-        @open="fontDropdownOpen"
-      >
+      <Dropdown class="font-dropdown" v-model="options.fontFamily" :data="fontFamilies" @open="fontDropdownOpen">
         <template #option="{ label }">
           <span :style="{ 'font-family': label }">{{ label }}</span>
         </template>
@@ -61,41 +44,25 @@
     </div>
     <div class="text-tool" style="z-index: 1004">
       <span class="tag muted is-block">Size (px)</span>
-      <Field
-        :modelValue="options.fontSize.slice(0, -2)"
-        @update:modelValue="changeFontSize"
-        type="number"
-      />
+      <Field :modelValue="options.fontSize.slice(0, -2)" @update:modelValue="changeFontSize" type="number" />
     </div>
     <div class="text-tool" style="z-index: 1003">
       <span class="tag muted is-block">{{ $t("colour") }}</span>
       <ColorPicker v-model="options.color" />
     </div>
-    <div
-      class="text-tool"
-      :class="{ active: options.fontWeight }"
-      @click="toggleBold"
-    >
+    <div class="text-tool" :class="{ active: options.fontWeight }" @click="toggleBold">
       <div class="icon is-large">
         <Icon size="36" src="bold.svg" />
       </div>
       <span class="tag is-block">{{ $t("bold") }}</span>
     </div>
-    <div
-      class="text-tool"
-      :class="{ active: options.fontStyle }"
-      @click="toggleItalic"
-    >
+    <div class="text-tool" :class="{ active: options.fontStyle }" @click="toggleItalic">
       <div class="icon is-large">
         <Icon size="36" src="italic.svg" />
       </div>
       <span class="tag is-block">{{ $t("italic") }}</span>
     </div>
-    <div
-      class="text-tool"
-      :class="{ active: options.textDecoration }"
-      @click="toggleUnderline"
-    >
+    <div class="text-tool" :class="{ active: options.textDecoration }" @click="toggleUnderline">
       <div class="icon is-large">
         <Icon size="36" src="underline.svg" />
       </div>
@@ -248,9 +215,12 @@ export default {
 
     const savedTexts = computed(() => store.state.stage.board.texts);
     const fontDropdownOpen = (visible) => {
-      document.querySelector("#topbar").style.overflow = visible
-        ? "visible"
-        : "auto";
+      const topbar = document.querySelector("#topbar");
+      if (topbar) {
+        topbar.style.overflow = visible
+          ? "visible"
+          : "auto";
+      }
     };
 
     onUnmounted(() => {
@@ -269,7 +239,9 @@ export default {
         });
     };
     onUnmounted(() => {
-      document.querySelector("#topbar").style.overflow = "auto";
+      const topbar = document.querySelector("#topbar");
+      if (topbar)
+        topbar.style.overflow = "auto";
     });
 
     return {
@@ -299,18 +271,28 @@ export default {
   position: fixed;
   z-index: 1000;
   background-color: rgba($color: white, $alpha: 0.8);
-  > p {
+
+  >p {
     position: absolute;
   }
 }
+
 .text-tool {
   z-index: 1001;
   position: relative;
   float: left;
 }
+
 .saved-text {
-  > div {
+  >div {
     width: 100%;
+    overflow: hidden;
+    p {
+      font-size: 12px !important;
+      transform: none !important;
+      transform-origin: none !important;
+      margin: 0px !important;
+    }
   }
 }
 </style>

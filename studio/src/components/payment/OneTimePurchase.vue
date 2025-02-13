@@ -3,7 +3,7 @@
     <div class="columns is-vcentered">
       <div class="column"></div>
       <div class="column"></div>
-      <h4 class="column is-2">Pay What You Can:</h4>
+      <h4 class="column is-2">Donate to UpStage:</h4>
       <div id="choice-buttons" class="column is-5">
         <div>
           <span class="input-symbol-dollar"></span>

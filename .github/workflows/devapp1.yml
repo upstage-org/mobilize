@@ -6,7 +6,7 @@ name: DEVAPP1 CI
 on:
   # Triggers the workflow on push or approved pull request on R1-2021 branch
   push:
-    branches: [Kona-2.0.9]
+    branches: [Monteiths-2.1.0]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -32,7 +32,7 @@ jobs:
           script: |
             cd /home/upstage/upstage/dashboard/
             git fetch
-            git checkout Kona-2.0.9
+            git checkout Monteiths-2.1.0
             git pull
             yarn
             yarn build:dev

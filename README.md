@@ -195,30 +195,11 @@ ACCEPT_SERVER_SEND_EMAIL_EXTERNAL = ['http://127.0.0.1:8000/'] # This is setup o
 STREAM_KEY=''
 ```
 
-2. `Dashboard` configurations
-
-When building UpStage's frontend code, Vue will look for `.env` files to load configurations. A `.env` file should contain these configurations (all the key must start with VUE_APP otherwise it won't be imported):
-
-```yaml
-VUE_APP_API_ENDPOINT=https://upstage.live/V4.0/ # Rest API endpoint, primary used for login and register operations
-VUE_APP_GRAPHQL_ENDPOINT=https://upstage.live/V4.0/ # GraphQL endpoint, used for all other common operations
-VUE_APP_STATIC_ASSETS_ENDPOINT=https://upstage.live/static/assets/ # Static asset endpoint, which is served by nginx
-VUE_APP_STUDIO_ENDPOINT=/studio/ # Studio endpoint, usually /studio
-VUE_APP_MQTT_NAMESPACE=meta # A broker can be shared between multiple instances of UpStage. Namespacing is required for prevent conflicts
-VUE_APP_MQTT_ENDPOINT=wss://svc.upstage.live:9002/mqtt # MQTT Broker endpoint, must be served in wss protocol so that it can be loaded over https
-VUE_APP_MQTT_USERNAME=
-VUE_APP_MQTT_PASSWORD=
-VUE_APP_STREAMING_PUBLISH_ENDPOINT=rtmp://streaming.upstage.live/live # Endpoint for broadcasting streams
-VUE_APP_STREAMING_SUBSCRIBE_ENDPOINT=https://streaming.upstage.live # Endpoint for subscribing streams, to show them on stages
-VUE_APP_STREAMING_USERNAME=admin # Username and password to access the node media server's public API, we use this to detect running streams
-VUE_APP_STREAMING_PASSWORD=admin
-```
-
-3. `Studio` configurations
+2. `Studio` configurations
 
 Studio and dashboard share the same access token and configurations base. In other word, you don't have to set up separate environment for studio.
 
-4. `Nginx` configurations
+3. `Nginx` configurations
 
 Redirect all `http` request from port 80 to the secured version with `https`
 

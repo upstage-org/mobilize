@@ -41,13 +41,13 @@ const responseInterceptor = axios.interceptors.response.use(
   (error) => {
     const originalRequest = error.config;
 
-    const message = error?.response?.data?.error;
-    if (message && !originalRequest.hideNotification) {
+    const msg = error?.response?.data?.error;
+    if (msg && !originalRequest.hideNotification) {
       let level = error?.response?.data?.level;
       if (!level) {
         level = "error";
       }
-      message[level](message);
+      message[level](msg);
     }
     const token = store.getters["auth/getToken"] || "";
 

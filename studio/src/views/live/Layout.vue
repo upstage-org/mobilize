@@ -7,6 +7,7 @@
     <Preloader />
     <template v-if="ready">
       <Board />
+      <ReloadStream />
       <ConnectionStatus />
       <MasqueradingStatus />
       <StageToolbox v-if="canPlay" />
@@ -37,6 +38,7 @@ import { useStore } from "vuex";
 import { computed, onUnmounted } from "vue";
 import { useRoute } from "vue-router";
 import { loggedIn } from "utils/auth";
+import ReloadStream from "./ReloadStream.vue";
 
 export default {
   components: {
@@ -52,6 +54,7 @@ export default {
     ConnectionStatus,
     MasqueradingStatus,
     Shell,
+    ReloadStream
   },
   setup: () => {
     const store = useStore();
